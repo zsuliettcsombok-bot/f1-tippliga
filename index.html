@@ -260,18 +260,20 @@
     route();
 
     // ✅ Supabase teszt
-    async function testSupabase(){
-      const out = document.getElementById("login-output");
-      if (out) out.textContent = "⏳ Supabase teszt...";
+    async function loginWithGitHub(){
+  const out = document.getElementById("login-output");
+  if (out) out.textContent = "⏳ GitHub belépés indítása...";
 
-      try{
-        const { data, error } = await supabaseClient.from("teams").select("*").limit(1);
-        if (error) throw error;
-        if (out) out.textContent = "✅ Supabase OK. teams sample: " + JSON.stringify(data ?? []);
-      }catch(e){
-        if (out) out.textContent = "❌ Supabase hiba: " + (e?.message || e);
-      }
-    }
+  const redirectTo = "https://zsuliettcsombok-bot.github.io/f1-tippliga/";
+
+  const { error } = await supabaseClient.auth.signInWithOAuth({
+    provider: "github",
+    options: { redirectTo }
+  });
+
+  if (error && out) out.textContent = "❌ GitHub login hiba: " + error.message;
+}
+
 
     // ✅ GitHub OAuth belépés – FONTOS: #login-ra jöjjön vissza
    async function loginWithGithub(){
