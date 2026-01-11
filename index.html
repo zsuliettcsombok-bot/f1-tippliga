@@ -1,100 +1,333 @@
 <!DOCTYPE html>
 <html lang="hu">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>F1 2026 Tipp Liga</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
-    body {
-      margin: 0;
+    :root{
+      --bg:#0b0b0b;
+      --card:#141414;
+      --card2:#1a1a1a;
+      --text:#ffffff;
+      --muted:#b9b9b9;
+      --red:#e10600;
+      --line:#2a2a2a;
+      --green:#00d084;
+      --yellow:#ffd54a;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
       font-family: Arial, Helvetica, sans-serif;
-      background: #0b0b0b;
-      color: white;
+      background: radial-gradient(1200px 600px at 20% 0%, #1b1b1b 0%, var(--bg) 55%);
+      color:var(--text);
     }
-    header {
-      background: #e10600;
-      padding: 20px;
-      text-align: center;
-      font-size: 28px;
-      font-weight: bold;
-      letter-spacing: 1px;
+    a{color:inherit}
+    .wrap{max-width:1050px;margin:0 auto;padding:18px}
+    /* Top broadcast bar */
+    .topbar{
+      position:sticky; top:0; z-index:10;
+      background: linear-gradient(90deg, var(--red), #b60000);
+      border-bottom: 1px solid rgba(255,255,255,.2);
     }
-    .container {
-      padding: 30px;
-      max-width: 900px;
-      margin: auto;
+    .topbar .wrap{
+      display:flex; gap:12px; align-items:center; justify-content:space-between;
+      padding:14px 18px;
     }
-    .card {
-      background: #1a1a1a;
-      padding: 20px;
-      border-radius: 8px;
-      margin-bottom: 20px;
+    .brand{
+      display:flex; align-items:center; gap:12px; font-weight:900; letter-spacing:.8px;
+      text-transform:uppercase;
     }
-    .card h2 {
-      color: #e10600;
-      margin-top: 0;
+    .brand-badge{
+      width:34px; height:34px; border-radius:10px;
+      background: rgba(0,0,0,.25);
+      display:grid; place-items:center;
+      border: 1px solid rgba(255,255,255,.25);
+      font-weight:900;
     }
-    footer {
-      text-align: center;
-      padding: 15px;
-      font-size: 14px;
-      color: #aaa;
+    .nav{
+      display:flex; gap:10px; align-items:center; flex-wrap:wrap;
+    }
+    .nav a{
+      text-decoration:none;
+      padding:8px 10px;
+      border-radius:10px;
+      background: rgba(0,0,0,.18);
+      border: 1px solid rgba(255,255,255,.18);
+      font-weight:700;
+      font-size:14px;
+    }
+    .nav a:hover{background: rgba(0,0,0,.28)}
+    /* Hero */
+    .hero{
+      margin-top:18px;
+      background: linear-gradient(180deg, rgba(225,6,0,.22), rgba(20,20,20,.9));
+      border: 1px solid rgba(225,6,0,.35);
+      border-radius:18px;
+      overflow:hidden;
+    }
+    .hero-inner{
+      padding:22px;
+      display:grid;
+      grid-template-columns: 1.15fr .85fr;
+      gap:16px;
+    }
+    .kicker{
+      display:inline-flex; align-items:center; gap:8px;
+      color: #ffdede;
+      font-weight:800;
+      letter-spacing:.4px;
+      background: rgba(0,0,0,.25);
+      border: 1px solid rgba(255,255,255,.12);
+      padding:6px 10px;
+      border-radius:999px;
+      font-size:13px;
+      margin-bottom:10px;
+    }
+    h1{
+      margin:0 0 10px 0;
+      font-size:34px;
+      line-height:1.15;
+      letter-spacing:.2px;
+    }
+    .lead{color:var(--muted); margin:0 0 16px 0; font-size:16px; line-height:1.5}
+    .cta-row{display:flex; gap:10px; flex-wrap:wrap}
+    .btn{
+      display:inline-flex; align-items:center; justify-content:center; gap:10px;
+      padding:12px 14px;
+      border-radius:12px;
+      border: 1px solid rgba(255,255,255,.18);
+      text-decoration:none;
+      font-weight:900;
+      letter-spacing:.2px;
+      font-size:14px;
+      background: rgba(0,0,0,.22);
+    }
+    .btn-primary{
+      background: var(--red);
+      border-color: rgba(255,255,255,.25);
+    }
+    .btn-primary:hover{filter:brightness(1.05)}
+    .btn:hover{background: rgba(0,0,0,.32)}
+    .panel{
+      background: rgba(0,0,0,.22);
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius:16px;
+      padding:16px;
+    }
+    .panel-title{
+      font-weight:900;
+      letter-spacing:.3px;
+      margin:0 0 10px 0;
+      display:flex; align-items:center; justify-content:space-between;
+    }
+    .tag{
+      font-size:12px;
+      padding:4px 8px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.18);
+      color:#ffe9a8;
+      background: rgba(0,0,0,.18);
+      font-weight:800;
+    }
+    .mini{
+      display:grid; gap:10px;
+      color: var(--muted);
+      font-size:14px;
+      line-height:1.45;
+    }
+    .mini strong{color:#fff}
+    .divider{height:1px;background:rgba(255,255,255,.09);margin:10px 0}
+    /* Cards grid */
+    .grid{
+      display:grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap:14px;
+      margin-top:16px;
+    }
+    .card{
+      grid-column: span 6;
+      background: linear-gradient(180deg, var(--card), var(--card2));
+      border: 1px solid rgba(255,255,255,.10);
+      border-radius:16px;
+      padding:16px;
+    }
+    .card h2{
+      margin:0 0 8px 0;
+      font-size:18px;
+      letter-spacing:.2px;
+      display:flex; gap:10px; align-items:center;
+    }
+    .card p{margin:0;color:var(--muted);line-height:1.5;font-size:14px}
+    .list{
+      margin:10px 0 0 0;
+      padding-left:18px;
+      color: var(--muted);
+      line-height:1.55;
+      font-size:14px;
+    }
+    .scoreboard{
+      grid-column: span 12;
+      background: #0f0f0f;
+      border:1px solid rgba(255,255,255,.10);
+      border-radius:16px;
+      overflow:hidden;
+    }
+    .score-head{
+      padding:12px 16px;
+      display:flex; align-items:center; justify-content:space-between;
+      background: linear-gradient(90deg, rgba(255,213,74,.16), rgba(0,0,0,0));
+      border-bottom:1px solid rgba(255,255,255,.08);
+      font-weight:900;
+      letter-spacing:.3px;
+    }
+    table{
+      width:100%;
+      border-collapse:collapse;
+      font-size:14px;
+    }
+    th, td{
+      padding:10px 12px;
+      border-bottom:1px solid rgba(255,255,255,.07);
+      text-align:left;
+    }
+    th{color:#eaeaea;font-weight:900;background:rgba(255,255,255,.03)}
+    td{color:var(--muted)}
+    .pill{
+      display:inline-flex; align-items:center; gap:6px;
+      padding:4px 10px; border-radius:999px;
+      border:1px solid rgba(255,255,255,.14);
+      font-weight:800; font-size:12px;
+      color:#fff;
+      background: rgba(0,0,0,.18);
+    }
+    .pill.green{border-color: rgba(0,208,132,.35); color:#d6fff1}
+    .pill.yellow{border-color: rgba(255,213,74,.35); color:#fff4c7}
+    .foot{
+      text-align:center;
+      color:#9a9a9a;
+      font-size:13px;
+      padding:18px 0 26px;
+    }
+    @media (max-width: 860px){
+      .hero-inner{grid-template-columns:1fr}
+      .card{grid-column: span 12}
+      h1{font-size:28px}
+      .nav{display:none}
     }
   </style>
 </head>
 <body>
 
-<header>
-  F1 2026 TIPP LIGA
-</header>
-
-<div class="container">
-
-  <div class="card">
-    <h2>🏁 Miről szól a játék?</h2>
-    <p>
-      Egy egész éves Formula–1 tippjáték, ahol minden futamra meg kell tippelni
-      az első 5 helyezettet.
-    </p>
-    <ul>
-      <li>🎯 Pontos helyezés: <b>3 pont</b></li>
-      <li>✅ Benne van a Top5-ben: <b>1 pont</b></li>
-      <li>👥 Kötelező csapat: <b>2 fő / csapat</b></li>
-    </ul>
+  <div class="topbar">
+    <div class="wrap">
+      <div class="brand">
+        <div class="brand-badge">F1</div>
+        <div>2026 Tipp Liga</div>
+      </div>
+      <div class="nav">
+        <a href="#szabalyok">Szabályok</a>
+        <a href="#pontozas">Pontozás</a>
+        <a href="#ranglista">Ranglista</a>
+        <a href="#indulas">Indulás</a>
+      </div>
+    </div>
   </div>
 
-  <div class="card">
-    <h2>👤 Egyéni & 👥 Csapatverseny</h2>
-    <p>
-      Minden játékos saját névvel indul, és kötelező egy kétfős csapatot alkotni.
-      A pontok számítanak egyéniben és csapatban is.
-    </p>
+  <div class="wrap">
+
+    <section class="hero" id="indulas">
+      <div class="hero-inner">
+        <div>
+          <div class="kicker">🏁 Broadcast mód • Top5 tipp minden futamra</div>
+          <h1>F1 2026 Tipp Liga – egyéni és 2 fős csapatverseny</h1>
+          <p class="lead">
+            Tippeld meg a futam <b>Top5</b> helyezettjeit! Rajt előtt a tippek <b>privátak</b>,
+            rajt után <b>nyilvánosak</b>. Futam után azonnali pontszámítás és ranglista.
+          </p>
+          <div class="cta-row">
+            <a class="btn btn-primary" href="#indulas">🚀 Belépés (hamarosan)</a>
+            <a class="btn" href="#szabalyok">📌 Szabályok</a>
+            <a class="btn" href="#ranglista">📊 Ranglista (hamarosan)</a>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-title">
+            <span>📡 Live státusz</span>
+            <span class="tag">MVP felület</span>
+          </div>
+          <div class="mini">
+            <div>🔒 Tippelés: <strong>futam rajtjáig</strong></div>
+            <div>👀 Tippek láthatósága: <strong>rajt után publikus</strong></div>
+            <div>👥 Csapat: <strong>kötelező, 2 fő</strong> (nincs csapatváltás)</div>
+            <div class="divider"></div>
+            <div>
+              <span class="pill green">Készen</span> Kezdő oldal + dizájn<br/>
+              <span class="pill yellow">Következő</span> Belépés + csapat + tipp felület
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="grid">
+      <div class="card" id="szabalyok">
+        <h2>📌 Szabályok</h2>
+        <p>
+          Minden futamra meg kell tippelni az <b>1–5. helyezettet</b>.
+          Tippelni a futam rajtjáig lehet. Rajt előtt mindenki csak a saját tippjeit látja,
+          rajt után minden tipp publikus.
+        </p>
+        <ul class="list">
+          <li>Top5 tipp: P1–P5</li>
+          <li>Tipp leadás: futam rajtjáig</li>
+          <li>Rajt után: tippek nyilvánosak</li>
+          <li>Csapat kötelező: 2 fő / csapat, nincs csapatváltás</li>
+        </ul>
+      </div>
+
+      <div class="card" id="pontozas">
+        <h2>🎯 Pontozás</h2>
+        <p>
+          Minden pozíciót külön pontozunk (P1–P5). Max futamonként <b>15 pont</b>.
+        </p>
+        <ul class="list">
+          <li>Ha eltalálod pontosan a helyezést: <b>3 pont</b></li>
+          <li>Ha benne van az 1–5-ben (de más helyen): <b>1 pont</b></li>
+          <li>Ha nincs benne a Top5-ben: <b>0 pont</b></li>
+        </ul>
+      </div>
+
+      <div class="scoreboard" id="ranglista">
+        <div class="score-head">
+          <span>📊 Ranglista (előnézet)</span>
+          <span class="pill yellow">hamarosan automatikus</span>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Név</th>
+              <th>Csapat</th>
+              <th>Pont</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>1</td><td>—</td><td>—</td><td>0</td></tr>
+            <tr><td>2</td><td>—</td><td>—</td><td>0</td></tr>
+            <tr><td>3</td><td>—</td><td>—</td><td>0</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <div class="foot">
+      © 2026 F1 Tipp Liga • GitHub Pages • Broadcast UI
+    </div>
+
   </div>
-
-  <div class="card">
-    <h2>📅 Tippelés menete</h2>
-    <ul>
-      <li>⏰ Tippelni a futam rajtjáig lehet</li>
-      <li>🔒 Rajt előtt csak a saját tipped látszik</li>
-      <li>👀 Rajt után minden tipp nyilvános</li>
-      <li>📊 Futam után azonnali ranglista</li>
-    </ul>
-  </div>
-
-  <div class="card">
-    <h2>🚀 Hamarosan indul</h2>
-    <p>
-      A tippelős felület fejlesztés alatt van.
-      Ez az oldal lesz a hivatalos belépési pont.
-    </p>
-  </div>
-
-</div>
-
-<footer>
-  © 2026 F1 Tipp Liga
-</footer>
 
 </body>
 </html>
-
