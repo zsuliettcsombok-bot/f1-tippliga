@@ -274,19 +274,20 @@
     }
 
     // ✅ GitHub OAuth belépés – FONTOS: #login-ra jöjjön vissza
-    async function loginWithGithub(){
-      const out = document.getElementById("login-output");
-      if (out) out.textContent = "⏳ GitHub belépés indítása...";
+   async function loginWithGithub(){
+  const out = document.getElementById("login-output");
+  if (out) out.textContent = "⏳ GitHub belépés indítása...";
 
-      const redirectTo = window.location.origin + window.location.pathname + "#login";
+  const redirectTo = window.location.origin + "/f1-tippliga/?auth_callback=1";
 
-      const { error } = await supabaseClient.auth.signInWithOAuth({
-        provider: "github",
-        options: { redirectTo }
-      });
+  const { error } = await supabaseClient.auth.signInWithOAuth({
+    provider: "github",
+    options: { redirectTo }
+  });
 
-      if (error && out) out.textContent = "❌ GitHub login hiba: " + error.message;
-    }
+  if (error && out) out.textContent = "❌ GitHub login hiba: " + error.message;
+}
+
 
     // Auth állapot figyelés
     supabaseClient.auth.onAuthStateChange((event, session) => {
