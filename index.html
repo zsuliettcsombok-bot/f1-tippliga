@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <title>F1 2026 Tipp Liga</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
   <style>
     :root{
       --bg:#0b0b0b;
@@ -23,311 +24,243 @@
       background: radial-gradient(1200px 600px at 20% 0%, #1b1b1b 0%, var(--bg) 55%);
       color:var(--text);
     }
-    a{color:inherit}
-    .wrap{max-width:1050px;margin:0 auto;padding:18px}
-    /* Top broadcast bar */
+    a{color:inherit;text-decoration:none}
+    .wrap{max-width:1100px;margin:0 auto;padding:18px}
+
+    /* ===== TOP BAR ===== */
     .topbar{
       position:sticky; top:0; z-index:10;
-      background: linear-gradient(90deg, var(--red), #b60000);
-      border-bottom: 1px solid rgba(255,255,255,.2);
+      background:linear-gradient(90deg,var(--red),#b60000);
+      border-bottom:1px solid rgba(255,255,255,.2);
     }
     .topbar .wrap{
-      display:flex; gap:12px; align-items:center; justify-content:space-between;
-      padding:14px 18px;
+      display:flex;justify-content:space-between;align-items:center;
     }
     .brand{
-      display:flex; align-items:center; gap:12px; font-weight:900; letter-spacing:.8px;
-      text-transform:uppercase;
+      display:flex;align-items:center;gap:12px;
+      font-weight:900;letter-spacing:.8px;text-transform:uppercase;
     }
     .brand-badge{
-      width:34px; height:34px; border-radius:10px;
-      background: rgba(0,0,0,.25);
-      display:grid; place-items:center;
-      border: 1px solid rgba(255,255,255,.25);
-      font-weight:900;
+      width:36px;height:36px;border-radius:10px;
+      display:grid;place-items:center;
+      background:rgba(0,0,0,.25);
+      border:1px solid rgba(255,255,255,.25);
     }
-    .nav{
-      display:flex; gap:10px; align-items:center; flex-wrap:wrap;
-    }
+    .nav{display:flex;gap:10px;flex-wrap:wrap}
     .nav a{
-      text-decoration:none;
-      padding:8px 10px;
-      border-radius:10px;
-      background: rgba(0,0,0,.18);
-      border: 1px solid rgba(255,255,255,.18);
-      font-weight:700;
-      font-size:14px;
+      padding:8px 12px;border-radius:10px;
+      background:rgba(0,0,0,.2);
+      border:1px solid rgba(255,255,255,.18);
+      font-weight:800;font-size:14px;
     }
-    .nav a:hover{background: rgba(0,0,0,.28)}
-    /* Hero */
+
+    /* ===== HERO ===== */
     .hero{
       margin-top:18px;
-      background: linear-gradient(180deg, rgba(225,6,0,.22), rgba(20,20,20,.9));
-      border: 1px solid rgba(225,6,0,.35);
-      border-radius:18px;
-      overflow:hidden;
+      border-radius:20px;
+      background:linear-gradient(180deg,rgba(225,6,0,.25),rgba(15,15,15,.95));
+      border:1px solid rgba(225,6,0,.35);
     }
     .hero-inner{
       padding:22px;
       display:grid;
-      grid-template-columns: 1.15fr .85fr;
-      gap:16px;
+      grid-template-columns:1.2fr .8fr;
+      gap:18px;
     }
     .kicker{
-      display:inline-flex; align-items:center; gap:8px;
-      color: #ffdede;
-      font-weight:800;
-      letter-spacing:.4px;
-      background: rgba(0,0,0,.25);
-      border: 1px solid rgba(255,255,255,.12);
-      padding:6px 10px;
-      border-radius:999px;
-      font-size:13px;
-      margin-bottom:10px;
-    }
-    h1{
-      margin:0 0 10px 0;
-      font-size:34px;
-      line-height:1.15;
-      letter-spacing:.2px;
-    }
-    .lead{color:var(--muted); margin:0 0 16px 0; font-size:16px; line-height:1.5}
-    .cta-row{display:flex; gap:10px; flex-wrap:wrap}
-    .btn{
-      display:inline-flex; align-items:center; justify-content:center; gap:10px;
-      padding:12px 14px;
-      border-radius:12px;
-      border: 1px solid rgba(255,255,255,.18);
-      text-decoration:none;
-      font-weight:900;
-      letter-spacing:.2px;
-      font-size:14px;
-      background: rgba(0,0,0,.22);
-    }
-    .btn-primary{
-      background: var(--red);
-      border-color: rgba(255,255,255,.25);
-    }
-    .btn-primary:hover{filter:brightness(1.05)}
-    .btn:hover{background: rgba(0,0,0,.32)}
-    .panel{
-      background: rgba(0,0,0,.22);
-      border: 1px solid rgba(255,255,255,.12);
-      border-radius:16px;
-      padding:16px;
-    }
-    .panel-title{
-      font-weight:900;
-      letter-spacing:.3px;
-      margin:0 0 10px 0;
-      display:flex; align-items:center; justify-content:space-between;
-    }
-    .tag{
-      font-size:12px;
-      padding:4px 8px;
-      border-radius:999px;
+      display:inline-flex;gap:8px;align-items:center;
+      padding:6px 12px;border-radius:999px;
+      font-weight:900;font-size:13px;
+      background:rgba(0,0,0,.25);
       border:1px solid rgba(255,255,255,.18);
-      color:#ffe9a8;
-      background: rgba(0,0,0,.18);
-      font-weight:800;
     }
-    .mini{
-      display:grid; gap:10px;
-      color: var(--muted);
-      font-size:14px;
-      line-height:1.45;
+    h1{margin:10px 0;font-size:34px}
+    .lead{color:var(--muted);font-size:16px;line-height:1.5}
+    .cta{display:flex;gap:12px;flex-wrap:wrap;margin-top:16px}
+    .btn{
+      padding:12px 16px;border-radius:14px;
+      border:1px solid rgba(255,255,255,.2);
+      background:rgba(0,0,0,.25);
+      font-weight:900;
+      cursor:pointer;
     }
-    .mini strong{color:#fff}
-    .divider{height:1px;background:rgba(255,255,255,.09);margin:10px 0}
-    /* Cards grid */
-    .grid{
-      display:grid;
-      grid-template-columns: repeat(12, 1fr);
-      gap:14px;
-      margin-top:16px;
-    }
-    .card{
-      grid-column: span 6;
-      background: linear-gradient(180deg, var(--card), var(--card2));
-      border: 1px solid rgba(255,255,255,.10);
-      border-radius:16px;
+    .btn-primary{background:var(--red)}
+    .panel{
+      background:rgba(0,0,0,.25);
+      border:1px solid rgba(255,255,255,.15);
+      border-radius:18px;
       padding:16px;
     }
-    .card h2{
-      margin:0 0 8px 0;
-      font-size:18px;
-      letter-spacing:.2px;
-      display:flex; gap:10px; align-items:center;
+    .panel h3{margin:0 0 10px 0}
+
+    /* ===== CARDS ===== */
+    .grid{display:grid;grid-template-columns:repeat(12,1fr);gap:16px;margin-top:18px}
+    .card{
+      grid-column:span 6;
+      background:linear-gradient(180deg,var(--card),var(--card2));
+      border:1px solid rgba(255,255,255,.1);
+      border-radius:18px;
+      padding:16px;
     }
-    .card p{margin:0;color:var(--muted);line-height:1.5;font-size:14px}
-    .list{
-      margin:10px 0 0 0;
-      padding-left:18px;
-      color: var(--muted);
-      line-height:1.55;
-      font-size:14px;
-    }
-    .scoreboard{
-      grid-column: span 12;
-      background: #0f0f0f;
-      border:1px solid rgba(255,255,255,.10);
-      border-radius:16px;
-      overflow:hidden;
-    }
-    .score-head{
-      padding:12px 16px;
-      display:flex; align-items:center; justify-content:space-between;
-      background: linear-gradient(90deg, rgba(255,213,74,.16), rgba(0,0,0,0));
-      border-bottom:1px solid rgba(255,255,255,.08);
-      font-weight:900;
-      letter-spacing:.3px;
-    }
-    table{
-      width:100%;
-      border-collapse:collapse;
-      font-size:14px;
-    }
-    th, td{
-      padding:10px 12px;
-      border-bottom:1px solid rgba(255,255,255,.07);
-      text-align:left;
-    }
-    th{color:#eaeaea;font-weight:900;background:rgba(255,255,255,.03)}
-    td{color:var(--muted)}
-    .pill{
-      display:inline-flex; align-items:center; gap:6px;
-      padding:4px 10px; border-radius:999px;
-      border:1px solid rgba(255,255,255,.14);
-      font-weight:800; font-size:12px;
-      color:#fff;
-      background: rgba(0,0,0,.18);
-    }
-    .pill.green{border-color: rgba(0,208,132,.35); color:#d6fff1}
-    .pill.yellow{border-color: rgba(255,213,74,.35); color:#fff4c7}
-    .foot{
-      text-align:center;
-      color:#9a9a9a;
-      font-size:13px;
-      padding:18px 0 26px;
-    }
-    @media (max-width: 860px){
+    .card h2{margin-top:0}
+    .card ul{padding-left:18px;color:var(--muted);line-height:1.5}
+
+    .scoreboard{grid-column:span 12}
+    table{width:100%;border-collapse:collapse}
+    th,td{padding:10px;border-bottom:1px solid rgba(255,255,255,.08)}
+    th{background:rgba(255,255,255,.05)}
+
+    .foot{text-align:center;color:#aaa;font-size:13px;margin:30px 0}
+
+    @media(max-width:900px){
       .hero-inner{grid-template-columns:1fr}
-      .card{grid-column: span 12}
+      .card{grid-column:span 12}
       h1{font-size:28px}
       .nav{display:none}
     }
   </style>
 </head>
+
 <body>
 
-  <div class="topbar">
-    <div class="wrap">
-      <div class="brand">
-        <div class="brand-badge">F1</div>
-        <div>2026 Tipp Liga</div>
-      </div>
-      <div class="nav">
-        <a href="#szabalyok">Szabályok</a>
-        <a href="#pontozas">Pontozás</a>
-        <a href="#ranglista">Ranglista</a>
-        <a href="#indulas">Indulás</a>
-      </div>
-    </div>
-  </div>
-
+<!-- ===== HEADER ===== -->
+<div class="topbar">
   <div class="wrap">
+    <div class="brand">
+      <div class="brand-badge">F1</div>
+      <div>2026 Tipp Liga</div>
+    </div>
+    <div class="nav">
+      <a href="#szabalyok">Szabályok</a>
+      <a href="#pontozas">Pontozás</a>
+      <a href="#ranglista">Ranglista</a>
+    </div>
+  </div>
+</div>
 
-    <section class="hero" id="indulas">
-      <div class="hero-inner">
-        <div>
-          <div class="kicker">🏁 Broadcast mód • Top5 tipp minden futamra</div>
-          <h1>F1 2026 Tipp Liga – egyéni és 2 fős csapatverseny</h1>
-          <p class="lead">
-            Tippeld meg a futam <b>Top5</b> helyezettjeit! Rajt előtt a tippek <b>privátak</b>,
-            rajt után <b>nyilvánosak</b>. Futam után azonnali pontszámítás és ranglista.
-          </p>
-          <div class="cta-row">
-            <a class="btn btn-primary" href="#indulas">🚀 Belépés (hamarosan)</a>
-            <a class="btn" href="#szabalyok">📌 Szabályok</a>
-            <a class="btn" href="#ranglista">📊 Ranglista (hamarosan)</a>
-          </div>
-        </div>
+<div class="wrap">
 
-        <div class="panel">
-          <div class="panel-title">
-            <span>📡 Live státusz</span>
-            <span class="tag">MVP felület</span>
-          </div>
-          <div class="mini">
-            <div>🔒 Tippelés: <strong>futam rajtjáig</strong></div>
-            <div>👀 Tippek láthatósága: <strong>rajt után publikus</strong></div>
-            <div>👥 Csapat: <strong>kötelező, 2 fő</strong> (nincs csapatváltás)</div>
-            <div class="divider"></div>
-            <div>
-              <span class="pill green">Készen</span> Kezdő oldal + dizájn<br/>
-              <span class="pill yellow">Következő</span> Belépés + csapat + tipp felület
-            </div>
-          </div>
-        </div>
+<!-- ===== HERO ===== -->
+<section class="hero">
+  <div class="hero-inner">
+    <div>
+      <div class="kicker">🏁 Broadcast mód • Top5 tipp minden futamra</div>
+      <h1>F1 2026 Tipp Liga – egyéni és 2 fős csapatverseny</h1>
+      <p class="lead">
+        Tippeld meg a futam Top5 helyezettjeit! Rajt előtt a tippek privátak,
+        rajt után nyilvánosak. Futam után azonnali ranglista.
+      </p>
+      <div class="cta">
+        <button class="btn btn-primary" id="loginBtn">🚀 Belépés</button>
+        <a class="btn" href="#szabalyok">📌 Szabályok</a>
       </div>
-    </section>
-
-    <section class="grid">
-      <div class="card" id="szabalyok">
-        <h2>📌 Szabályok</h2>
-        <p>
-          Minden futamra meg kell tippelni az <b>1–5. helyezettet</b>.
-          Tippelni a futam rajtjáig lehet. Rajt előtt mindenki csak a saját tippjeit látja,
-          rajt után minden tipp publikus.
-        </p>
-        <ul class="list">
-          <li>Top5 tipp: P1–P5</li>
-          <li>Tipp leadás: futam rajtjáig</li>
-          <li>Rajt után: tippek nyilvánosak</li>
-          <li>Csapat kötelező: 2 fő / csapat, nincs csapatváltás</li>
-        </ul>
-      </div>
-
-      <div class="card" id="pontozas">
-        <h2>🎯 Pontozás</h2>
-        <p>
-          Minden pozíciót külön pontozunk (P1–P5). Max futamonként <b>15 pont</b>.
-        </p>
-        <ul class="list">
-          <li>Ha eltalálod pontosan a helyezést: <b>3 pont</b></li>
-          <li>Ha benne van az 1–5-ben (de más helyen): <b>1 pont</b></li>
-          <li>Ha nincs benne a Top5-ben: <b>0 pont</b></li>
-        </ul>
-      </div>
-
-      <div class="scoreboard" id="ranglista">
-        <div class="score-head">
-          <span>📊 Ranglista (előnézet)</span>
-          <span class="pill yellow">hamarosan automatikus</span>
-        </div>
-        <table>
-          <thead>
-            <tr>
-              <th>#</th>
-              <th>Név</th>
-              <th>Csapat</th>
-              <th>Pont</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr><td>1</td><td>—</td><td>—</td><td>0</td></tr>
-            <tr><td>2</td><td>—</td><td>—</td><td>0</td></tr>
-            <tr><td>3</td><td>—</td><td>—</td><td>0</td></tr>
-          </tbody>
-        </table>
-      </div>
-    </section>
-
-    <div class="foot">
-      © 2026 F1 Tipp Liga • GitHub Pages • Broadcast UI
     </div>
 
+    <div class="panel">
+      <h3>📡 Live státusz</h3>
+      <p>🔒 Tippelés: <b>futam rajtjáig</b></p>
+      <p>👀 Tippek: <b>rajt után publikus</b></p>
+      <p>👥 Csapat: <b>kötelező, 2 fő</b></p>
+      <p style="color:var(--yellow);font-weight:900">MVP DEMO verzió</p>
+    </div>
   </div>
+</section>
+
+<!-- ===== INFO ===== -->
+<section class="grid">
+
+  <div class="card" id="szabalyok">
+    <h2>📌 Szabályok</h2>
+    <ul>
+      <li>Minden futamra Top5 tipp (P1–P5)</li>
+      <li>Tippelés futam rajtjáig</li>
+      <li>Rajt után minden tipp publikus</li>
+      <li>2 fős csapat kötelező, nincs csapatváltás</li>
+    </ul>
+  </div>
+
+  <div class="card" id="pontozas">
+    <h2>🎯 Pontozás</h2>
+    <ul>
+      <li>Pontos helyezés: <b>3 pont</b></li>
+      <li>Top5-ben van, de máshol: <b>1 pont</b></li>
+      <li>Nincs Top5-ben: <b>0 pont</b></li>
+      <li>Max futamonként: <b>15 pont</b></li>
+    </ul>
+  </div>
+
+  <div class="card scoreboard" id="ranglista">
+    <h2>📊 Ranglista (előnézet)</h2>
+    <table>
+      <thead>
+        <tr><th>#</th><th>Név</th><th>Csapat</th><th>Pont</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>1</td><td>—</td><td>—</td><td>0</td></tr>
+        <tr><td>2</td><td>—</td><td>—</td><td>0</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+</section>
+
+<div class="foot">© 2026 F1 Tipp Liga • DEMO</div>
+
+</div>
+
+<!-- ===== LOGIN MODAL (DEMO) ===== -->
+<div id="modalBg" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:9999"></div>
+
+<div id="modal" style="display:none;position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);
+background:#101010;border-radius:18px;border:1px solid rgba(255,255,255,.2);
+width:min(520px,calc(100%-24px));z-index:10000">
+
+  <div style="padding:14px 16px;background:linear-gradient(90deg,var(--red),#000);font-weight:900">
+    🚀 Belépés – DEMO
+  </div>
+
+  <div style="padding:16px;display:grid;gap:12px">
+    <input id="player" placeholder="Játékos név" style="padding:12px;border-radius:12px;background:#000;color:#fff;border:1px solid #333">
+    <input id="team" placeholder="Csapat neve" style="padding:12px;border-radius:12px;background:#000;color:#fff;border:1px solid #333">
+    <div id="code" style="font-weight:900;letter-spacing:2px"></div>
+    <button class="btn btn-primary" id="saveBtn">Mentés (DEMO)</button>
+    <button class="btn" id="closeBtn">Mégse</button>
+  </div>
+</div>
+
+<script>
+const STORAGE_KEY="f1_demo_profile";
+const loginBtn=document.getElementById("loginBtn");
+const modal=document.getElementById("modal");
+const bg=document.getElementById("modalBg");
+
+function genCode(){
+  return "F1-"+Math.random().toString(36).substr(2,6).toUpperCase();
+}
+
+loginBtn.onclick=()=>{
+  bg.style.display="block";
+  modal.style.display="block";
+  document.getElementById("code").textContent=genCode();
+};
+
+document.getElementById("closeBtn").onclick=()=>{bg.style.display="none";modal.style.display="none"};
+
+document.getElementById("saveBtn").onclick=()=>{
+  const player=document.getElementById("player").value.trim();
+  const team=document.getElementById("team").value.trim();
+  if(!player||!team){alert("Minden mező kötelező");return}
+  localStorage.setItem(STORAGE_KEY,JSON.stringify({player,team}));
+  loginBtn.textContent="✅ Belépve: "+player;
+  bg.style.display="none";modal.style.display="none";
+};
+
+const saved=localStorage.getItem(STORAGE_KEY);
+if(saved){
+  const d=JSON.parse(saved);
+  loginBtn.textContent="✅ Belépve: "+d.player;
+}
+</script>
 
 </body>
 </html>
