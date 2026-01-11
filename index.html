@@ -2,9 +2,8 @@
 <html lang="hu">
 <head>
   <meta charset="UTF-8" />
-  <title>F1 2026 Tipp Liga</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
+  <title>F1 2026 Tipp Liga</title>
   <style>
     :root{
       --bg:#0b0b0b;
@@ -21,261 +20,323 @@
     body{
       margin:0;
       font-family: Arial, Helvetica, sans-serif;
-      background: radial-gradient(1200px 600px at 20% 0%, #1b1b1b 0%, var(--bg) 55%);
       color:var(--text);
+      background: radial-gradient(1200px 600px at 20% 0%, #1b1b1b 0%, var(--bg) 55%);
     }
-    a{color:inherit;text-decoration:none}
-    .wrap{max-width:1100px;margin:0 auto;padding:18px}
-
-    /* ===== TOP BAR ===== */
+    a{color:inherit; text-decoration:none}
     .topbar{
       position:sticky; top:0; z-index:10;
-      background:linear-gradient(90deg,var(--red),#b60000);
-      border-bottom:1px solid rgba(255,255,255,.2);
+      background: linear-gradient(90deg, #b10000 0%, var(--red) 50%, #b10000 100%);
+      border-bottom: 1px solid rgba(255,255,255,.12);
     }
-    .topbar .wrap{
-      display:flex;justify-content:space-between;align-items:center;
+    .topbar-inner{
+      max-width:1100px; margin:0 auto;
+      padding:14px 18px;
+      display:flex; align-items:center; justify-content:space-between; gap:12px;
     }
-    .brand{
-      display:flex;align-items:center;gap:12px;
-      font-weight:900;letter-spacing:.8px;text-transform:uppercase;
-    }
-    .brand-badge{
-      width:36px;height:36px;border-radius:10px;
+    .brand{display:flex; align-items:center; gap:12px; font-weight:800; letter-spacing:.5px}
+    .badge{
+      width:44px;height:32px;border-radius:10px;
       display:grid;place-items:center;
-      background:rgba(0,0,0,.25);
-      border:1px solid rgba(255,255,255,.25);
-    }
-    .nav{display:flex;gap:10px;flex-wrap:wrap}
-    .nav a{
-      padding:8px 12px;border-radius:10px;
-      background:rgba(0,0,0,.2);
+      background: rgba(0,0,0,.22);
       border:1px solid rgba(255,255,255,.18);
-      font-weight:800;font-size:14px;
+      font-weight:900;
     }
-
-    /* ===== HERO ===== */
+    nav{display:flex; gap:10px; flex-wrap:wrap}
+    .navbtn{
+      padding:10px 14px;
+      border-radius:12px;
+      border:1px solid rgba(255,255,255,.18);
+      background: rgba(0,0,0,.18);
+      font-weight:700;
+      transition:.15s transform, .15s background;
+    }
+    .navbtn:hover{transform:translateY(-1px); background: rgba(0,0,0,.28)}
+    .wrap{max-width:1100px; margin:0 auto; padding:22px 18px 40px}
     .hero{
       margin-top:18px;
-      border-radius:20px;
-      background:linear-gradient(180deg,rgba(225,6,0,.25),rgba(15,15,15,.95));
-      border:1px solid rgba(225,6,0,.35);
-    }
-    .hero-inner{
+      border-radius:22px;
       padding:22px;
-      display:grid;
-      grid-template-columns:1.2fr .8fr;
-      gap:18px;
+      border:1px solid rgba(225,6,0,.35);
+      background: radial-gradient(900px 350px at 20% 10%, rgba(225,6,0,.25) 0%, rgba(0,0,0,.1) 65%);
+      box-shadow: 0 12px 40px rgba(0,0,0,.55);
     }
-    .kicker{
-      display:inline-flex;gap:8px;align-items:center;
-      padding:6px 12px;border-radius:999px;
-      font-weight:900;font-size:13px;
-      background:rgba(0,0,0,.25);
+    .hero-inner{display:grid; grid-template-columns: 1.6fr 1fr; gap:18px}
+    h1{margin:6px 0 10px; font-size:44px; line-height:1.05}
+    .lead{color:var(--muted); font-size:16px; line-height:1.5}
+    .pill{
+      display:inline-flex; gap:10px; align-items:center;
+      padding:8px 12px; border-radius:999px;
       border:1px solid rgba(255,255,255,.18);
+      background: rgba(0,0,0,.25);
+      font-weight:700;
+      color:#f5f5f5;
     }
-    h1{margin:10px 0;font-size:34px}
-    .lead{color:var(--muted);font-size:16px;line-height:1.5}
-    .cta{display:flex;gap:12px;flex-wrap:wrap;margin-top:16px}
+    .actions{display:flex; gap:12px; flex-wrap:wrap; margin-top:14px}
     .btn{
-      padding:12px 16px;border-radius:14px;
-      border:1px solid rgba(255,255,255,.2);
-      background:rgba(0,0,0,.25);
-      font-weight:900;
+      padding:12px 16px; border-radius:14px; font-weight:800;
+      border:1px solid rgba(255,255,255,.16);
+      background: rgba(0,0,0,.2);
       cursor:pointer;
     }
-    .btn-primary{background:var(--red)}
-    .panel{
-      background:rgba(0,0,0,.25);
-      border:1px solid rgba(255,255,255,.15);
-      border-radius:18px;
-      padding:16px;
+    .btn.primary{
+      background: linear-gradient(180deg, #ff2a2a 0%, var(--red) 60%, #b10000 100%);
+      border-color: rgba(255,255,255,.12);
     }
-    .panel h3{margin:0 0 10px 0}
-
-    /* ===== CARDS ===== */
-    .grid{display:grid;grid-template-columns:repeat(12,1fr);gap:16px;margin-top:18px}
+    .grid{
+      margin-top:18px;
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:16px;
+    }
     .card{
-      grid-column:span 6;
-      background:linear-gradient(180deg,var(--card),var(--card2));
-      border:1px solid rgba(255,255,255,.1);
       border-radius:18px;
-      padding:16px;
+      background: linear-gradient(180deg, rgba(255,255,255,.03) 0%, rgba(255,255,255,.02) 100%);
+      border:1px solid rgba(255,255,255,.10);
+      padding:18px;
+      box-shadow: 0 10px 26px rgba(0,0,0,.45);
     }
-    .card h2{margin-top:0}
-    .card ul{padding-left:18px;color:var(--muted);line-height:1.5}
-
-    .scoreboard{grid-column:span 12}
-    table{width:100%;border-collapse:collapse}
-    th,td{padding:10px;border-bottom:1px solid rgba(255,255,255,.08)}
-    th{background:rgba(255,255,255,.05)}
-
-    .foot{text-align:center;color:#aaa;font-size:13px;margin:30px 0}
+    .card h2{margin:0 0 8px; font-size:28px}
+    .muted{color:var(--muted)}
+    ul{margin:10px 0 0 18px}
+    li{margin:6px 0}
+    .rightbox{
+      border-radius:18px;
+      background: rgba(0,0,0,.22);
+      border:1px solid rgba(255,255,255,.14);
+      padding:16px;
+      min-height:190px;
+    }
+    .statusline{display:flex; align-items:center; justify-content:space-between; gap:10px}
+    .tag{
+      display:inline-flex; align-items:center; gap:8px;
+      padding:6px 10px; border-radius:999px;
+      border:1px solid rgba(255,255,255,.18);
+      font-weight:800;
+      background: rgba(0,0,0,.18);
+    }
+    .ok{color:var(--green)}
+    .warn{color:var(--yellow)}
+    .section-title{margin:22px 0 10px; font-size:22px; font-weight:900}
+    .hidden{display:none !important}
+    .foot{text-align:center; color:#aaa; font-size:13px; margin:30px 0}
 
     @media(max-width:900px){
       .hero-inner{grid-template-columns:1fr}
-      .card{grid-column:span 12}
-      h1{font-size:28px}
-      .nav{display:none}
+      .grid{grid-template-columns:1fr}
+      h1{font-size:32px}
     }
   </style>
-  <!-- Supabase -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script>
-  // 🔧 SUPABASE KONFIG
-  const SUPABASE_URL = "https://mtobtiwoiqqxdkduvjmf.supabase.co";
-const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9....";
-
-  const supabase = supabase.createClient(
-    SUPABASE_URL,
-    SUPABASE_ANON_KEY
-  );
-
-  console.log("Supabase csatlakozva ✅");
-</script>
-
 </head>
-
 <body>
-
-<!-- ===== HEADER ===== -->
-<div class="topbar">
-  <div class="wrap">
-    <div class="brand">
-      <div class="brand-badge">F1</div>
-      <div>2026 Tipp Liga</div>
-    </div>
-    <div class="nav">
-      <a href="#szabalyok">Szabályok</a>
-      <a href="#pontozas">Pontozás</a>
-      <a href="#ranglista">Ranglista</a>
-    </div>
-  </div>
-</div>
-
-<div class="wrap">
-
-<!-- ===== HERO ===== -->
-<section class="hero">
-  <div class="hero-inner">
-    <div>
-      <div class="kicker">🏁 Broadcast mód • Top5 tipp minden futamra</div>
-      <h1>F1 2026 Tipp Liga – egyéni és 2 fős csapatverseny</h1>
-      <p class="lead">
-        Tippeld meg a futam Top5 helyezettjeit! Rajt előtt a tippek privátak,
-        rajt után nyilvánosak. Futam után azonnali ranglista.
-      </p>
-      <div class="cta">
-        <button class="btn btn-primary" id="loginBtn">🚀 Belépés</button>
-        <a class="btn" href="#szabalyok">📌 Szabályok</a>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="brand">
+        <div class="badge">F1</div>
+        <div>2026 TIPP LIGA</div>
       </div>
+      <nav>
+        <a class="navbtn" href="#home">Kezdő</a>
+        <a class="navbtn" href="#rules">Szabályok</a>
+        <a class="navbtn" href="#scoring">Pontozás</a>
+        <a class="navbtn" href="#rank">Ranglista</a>
+        <a class="navbtn" href="#login">Belépés</a>
+      </nav>
     </div>
+  </header>
 
-    <div class="panel">
-      <h3>📡 Live státusz</h3>
-      <p>🔒 Tippelés: <b>futam rajtjáig</b></p>
-      <p>👀 Tippek: <b>rajt után publikus</b></p>
-      <p>👥 Csapat: <b>kötelező, 2 fő</b></p>
-      <p style="color:var(--yellow);font-weight:900">MVP DEMO verzió</p>
-    </div>
-  </div>
-</section>
+  <main class="wrap">
+    <!-- HOME -->
+    <section id="view-home">
+      <div class="hero">
+        <div class="hero-inner">
+          <div>
+            <div class="pill">🏁 Broadcast mód • Top5 tipp minden futamra</div>
+            <h1>F1 2026 Tipp Liga – egyéni és 2 fős csapatverseny</h1>
+            <div class="lead">
+              Tippeld meg a futam Top5 helyezettjeit! Rajt előtt a tippek privátak, rajt után nyilvánosak. Futam után azonnali ranglista.
+            </div>
+            <div class="actions">
+              <button class="btn primary" onclick="goto('#login')">🚀 Belépés</button>
+              <button class="btn" onclick="goto('#rules')">📌 Szabályok</button>
+              <button class="btn" onclick="goto('#rank')">📊 Ranglista</button>
+            </div>
+          </div>
+          <div class="rightbox">
+            <div class="statusline">
+              <div style="font-size:20px;font-weight:900">🕹️ Live státusz</div>
+              <div class="tag">MVP DEMO</div>
+            </div>
+            <div style="margin-top:10px; line-height:1.7">
+              <div>🔒 <b>Tippelés:</b> futam rajtjáig</div>
+              <div>👀 <b>Tippek:</b> rajt után publikus</div>
+              <div>👥 <b>Csapat:</b> kötelező, 2 fő</div>
+              <div class="warn" style="margin-top:10px; font-weight:900">⚠️ GitHub Pages kompatibilis (hash routing)</div>
+              <div class="muted" style="margin-top:8px">Ha a menüpontokra kattintva 404 volt, ez most megoldja.</div>
+            </div>
+          </div>
+        </div>
+      </div>
 
-<!-- ===== INFO ===== -->
-<section class="grid">
+      <div class="grid">
+        <div class="card">
+          <h2>📌 Szabályok</h2>
+          <div class="muted">Röviden:</div>
+          <ul>
+            <li>Minden futamra Top5 tipp (P1–P5)</li>
+            <li>Tippelés futam rajtjáig</li>
+            <li>Rajt után minden tipp publikus</li>
+            <li>2 fős csapat kötelező, nincs csapatváltás</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h2>🎯 Pontozás</h2>
+          <ul>
+            <li>Pontos helyezés: <b>3 pont</b></li>
+            <li>Top5-ben van, de máshol: <b>1 pont</b></li>
+            <li>Nincs Top5-ben: <b>0 pont</b></li>
+            <li>Max futamonként: <b>15 pont</b></li>
+          </ul>
+        </div>
+      </div>
+    </section>
 
-  <div class="card" id="szabalyok">
-    <h2>📌 Szabályok</h2>
-    <ul>
-      <li>Minden futamra Top5 tipp (P1–P5)</li>
-      <li>Tippelés futam rajtjáig</li>
-      <li>Rajt után minden tipp publikus</li>
-      <li>2 fős csapat kötelező, nincs csapatváltás</li>
-    </ul>
-  </div>
+    <!-- RULES -->
+    <section id="view-rules" class="hidden">
+      <div class="card">
+        <h2>📌 Szabályok</h2>
+        <p class="muted">Itt lesz a részletes szabályzat. (MVP-ben csak a váz.)</p>
+        <ul>
+          <li>Top5 tipp minden futamra</li>
+          <li>Határidő: futam rajtja</li>
+          <li>Rajt után: tippek láthatók</li>
+          <li>Csapat: 2 fő (fix)</li>
+        </ul>
+        <div class="actions">
+          <button class="btn" onclick="goto('#home')">⬅️ Vissza</button>
+        </div>
+      </div>
+    </section>
 
-  <div class="card" id="pontozas">
-    <h2>🎯 Pontozás</h2>
-    <ul>
-      <li>Pontos helyezés: <b>3 pont</b></li>
-      <li>Top5-ben van, de máshol: <b>1 pont</b></li>
-      <li>Nincs Top5-ben: <b>0 pont</b></li>
-      <li>Max futamonként: <b>15 pont</b></li>
-    </ul>
-  </div>
+    <!-- SCORING -->
+    <section id="view-scoring" class="hidden">
+      <div class="card">
+        <h2>🎯 Pontozás</h2>
+        <ul>
+          <li>P1–P5 mind külön pontozódik</li>
+          <li>Pontos találat: 3 pont</li>
+          <li>Top5-ben benne van (más helyen): 1 pont</li>
+          <li>Nincs Top5-ben: 0 pont</li>
+        </ul>
+        <div class="actions">
+          <button class="btn" onclick="goto('#home')">⬅️ Vissza</button>
+        </div>
+      </div>
+    </section>
 
-  <div class="card scoreboard" id="ranglista">
-    <h2>📊 Ranglista (előnézet)</h2>
-    <table>
-      <thead>
-        <tr><th>#</th><th>Név</th><th>Csapat</th><th>Pont</th></tr>
-      </thead>
-      <tbody>
-        <tr><td>1</td><td>—</td><td>—</td><td>0</td></tr>
-        <tr><td>2</td><td>—</td><td>—</td><td>0</td></tr>
-      </tbody>
-    </table>
-  </div>
+    <!-- RANK -->
+    <section id="view-rank" class="hidden">
+      <div class="card">
+        <h2>📊 Ranglista</h2>
+        <div class="muted">Később: Supabase-ből jönnek az adatok (teams, team_points).</div>
+        <div id="rank-output" style="margin-top:12px"></div>
+        <div class="actions">
+          <button class="btn" onclick="loadRank()">🔄 Ranglista frissítés</button>
+          <button class="btn" onclick="goto('#home')">⬅️ Vissza</button>
+        </div>
+      </div>
+    </section>
 
-</section>
+    <!-- LOGIN -->
+    <section id="view-login" class="hidden">
+      <div class="card">
+        <h2>🚀 Belépés</h2>
+        <p class="muted">MVP: emailes belépés / GitHub OAuth később. (Most csak Supabase kapcsolat teszt.)</p>
 
-<div class="foot">© 2026 F1 Tipp Liga • DEMO</div>
+        <div class="actions">
+          <button class="btn primary" onclick="testSupabase()">✅ Supabase kapcsolat teszt</button>
+          <button class="btn" onclick="goto('#home')">⬅️ Vissza</button>
+        </div>
 
-</div>
+        <div id="login-output" style="margin-top:12px" class="muted"></div>
+      </div>
+    </section>
 
-<!-- ===== LOGIN MODAL (DEMO) ===== -->
-<div id="modalBg" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:9999"></div>
+    <div class="foot">© F1 Tipp Liga 2026 • GitHub Pages • Supabase</div>
+  </main>
 
-<div id="modal" style="display:none;position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);
-background:#101010;border-radius:18px;border:1px solid rgba(255,255,255,.2);
-width:min(520px,calc(100%-24px));z-index:10000">
+  <!-- Supabase -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    // ======= IDE JÖN A TE SUPABASE ADATOD =======
+    const SUPABASE_URL = "https://mtobtiwoiqqxdkduvjmf.supabase.co";
+    const SUPABASE_ANON_KEY = "IDE_PASZTÁZD_BE_A_TELJES_ANON_PUBLIC_KULCSOT";
+    // ===========================================
 
-  <div style="padding:14px 16px;background:linear-gradient(90deg,var(--red),#000);font-weight:900">
-    🚀 Belépés – DEMO
-  </div>
+    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-  <div style="padding:16px;display:grid;gap:12px">
-    <input id="player" placeholder="Játékos név" style="padding:12px;border-radius:12px;background:#000;color:#fff;border:1px solid #333">
-    <input id="team" placeholder="Csapat neve" style="padding:12px;border-radius:12px;background:#000;color:#fff;border:1px solid #333">
-    <div id="code" style="font-weight:900;letter-spacing:2px"></div>
-    <button class="btn btn-primary" id="saveBtn">Mentés (DEMO)</button>
-    <button class="btn" id="closeBtn">Mégse</button>
-  </div>
-</div>
+    function goto(hash){
+      location.hash = hash;
+    }
 
-<script>
-const STORAGE_KEY="f1_demo_profile";
-const loginBtn=document.getElementById("loginBtn");
-const modal=document.getElementById("modal");
-const bg=document.getElementById("modalBg");
+    function showView(name){
+      const views = ["home","rules","scoring","rank","login"];
+      for (const v of views){
+        document.getElementById("view-" + v).classList.add("hidden");
+      }
+      document.getElementById("view-" + name).classList.remove("hidden");
+      if(name === "rank") loadRank();
+    }
 
-function genCode(){
-  return "F1-"+Math.random().toString(36).substr(2,6).toUpperCase();
-}
+    function route(){
+      const h = (location.hash || "#home").replace("#","");
+      const valid = new Set(["home","rules","scoring","rank","login"]);
+      showView(valid.has(h) ? h : "home");
+    }
 
-loginBtn.onclick=()=>{
-  bg.style.display="block";
-  modal.style.display="block";
-  document.getElementById("code").textContent=genCode();
-};
+    window.addEventListener("hashchange", route);
+    route();
 
-document.getElementById("closeBtn").onclick=()=>{bg.style.display="none";modal.style.display="none"};
+    async function testSupabase(){
+      const out = document.getElementById("login-output");
+      out.textContent = "Kapcsolódás...";
+      try{
+        // egyszerű olvasás: teams táblából 1 sor (ha van)
+        const { data, error } = await supabaseClient.from("teams").select("*").limit(1);
+        if(error) throw error;
+        out.textContent = "✅ Supabase OK. teams sample: " + JSON.stringify(data);
+      }catch(e){
+        out.textContent = "❌ Supabase hiba: " + (e?.message || e);
+      }
+    }
 
-document.getElementById("saveBtn").onclick=()=>{
-  const player=document.getElementById("player").value.trim();
-  const team=document.getElementById("team").value.trim();
-  if(!player||!team){alert("Minden mező kötelező");return}
-  localStorage.setItem(STORAGE_KEY,JSON.stringify({player,team}));
-  loginBtn.textContent="✅ Belépve: "+player;
-  bg.style.display="none";modal.style.display="none";
-};
+    async function loadRank(){
+      const el = document.getElementById("rank-output");
+      el.textContent = "Betöltés...";
+      try{
+        // MVP: team_points összegzés (ha még üres, nem baj)
+        const { data, error } = await supabaseClient
+          .from("team_points")
+          .select("team_id, points");
 
-const saved=localStorage.getItem(STORAGE_KEY);
-if(saved){
-  const d=JSON.parse(saved);
-  loginBtn.textContent="✅ Belépve: "+d.player;
-}
-</script>
+        if(error) throw error;
 
+        if(!data || data.length === 0){
+          el.innerHTML = "<div class='muted'>Még nincs adat (team_points üres). Ez rendben van most.</div>";
+          return;
+        }
+
+        const sum = {};
+        for(const row of data){
+          sum[row.team_id] = (sum[row.team_id] || 0) + (row.points || 0);
+        }
+
+        const sorted = Object.entries(sum).sort((a,b)=>b[1]-a[1]);
+        el.innerHTML = "<ol>" + sorted.map(([team,pts])=>`<li><b>${team}</b> – ${pts} pont</li>`).join("") + "</ol>";
+      }catch(e){
+        el.textContent = "❌ Ranglista hiba: " + (e?.message || e);
+      }
+    }
+  </script>
 </body>
 </html>
