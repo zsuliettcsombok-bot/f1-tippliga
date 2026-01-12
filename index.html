@@ -115,6 +115,7 @@
       word-break: break-word;
     }
     .foot{margin-top:18px; text-align:center; color:#bdbdbd; opacity:.9; font-size:14px;}
+    ul{position:relative; z-index:1;}
   </style>
 </head>
 
@@ -147,7 +148,6 @@
           <button class="btn primary" onclick="goto('#login')">🚀 Belépés</button>
           <button class="btn" onclick="goto('#rules')">📌 Szabályok</button>
           <button class="btn" onclick="goto('#rank')">📊 Ranglista</button>
-          <button class="btn" onclick="refreshHomeAuthLine();refreshLoginLine()">🔄 Frissítés</button>
         </div>
 
         <div class="line" id="home-auth-line">🔒 Státusz: <span class="muted">nincs ellenőrizve</span></div>
@@ -199,14 +199,14 @@
     <section id="view-login" class="hidden">
       <div class="card">
         <h2>🚀 Belépés</h2>
-        <p class="muted">Először teszteljük a DB-t, majd GitHub-bal belépünk.</p>
+        <p class="muted">Először teszteljük a Supabase-t, majd GitHub-bal belépünk.</p>
 
         <div class="actions">
           <button class="btn primary" onclick="testSupabase()">✅ Supabase kapcsolat teszt</button>
           <button class="btn" onclick="loginWithGithub()">🐙 GitHub belépés</button>
-          <button class="btn" onclick="goto('#home')">⬅️ Vissza</button>
           <button class="btn" onclick="logout()">🚪 Kijelentkezés</button>
-          <button class="btn" onclick="refreshHomeAuthLine();refreshLoginLine()">🔄 Frissítés</button>
+          <button class="btn" onclick="manualRefresh()">🔄 Frissítés</button>
+          <button class="btn" onclick="goto('#home')">⬅️ Vissza</button>
         </div>
 
         <div id="login-output" class="line muted">Készen áll.</div>
@@ -219,10 +219,11 @@
   <!-- ===================== SUPABASE + AUTH (TELJES) ===================== -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
-    // ✅ A TE MAI, ADATAID (TELJESEN BENNE VAN)
+    // ✅ A TE ADATAID
     const SUPABASE_URL = "https://mtobtiwoiqqxdkduvjmf.supabase.co";
     const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im10b2J0aXdvaXFxeGRrZHV2am1mIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjgxMTY2NzAsImV4cCI6MjA4MzY5MjY3MH0.qB5tb9uj2GN4iKRvyZnv_lVRZ9xnlgtY3rN6oZV_LDc";
 
+    // ✅ Session perzisztálás
     const supabaseClient = window.supabase.createClient(
       SUPABASE_URL,
       SUPABASE_ANON_KEY,
@@ -248,51 +249,53 @@
       }
     }
 
-    function route(){
+    async function route(){
       const h = (location.hash || "#home").replace("#","");
       const valid = new Set(["home","rules","scoring","rank","login"]);
       showView(valid.has(h) ? h : "home");
 
-      refreshHomeAuthLine();
-      refreshLoginLine();
-
+      await refreshHomeAuthLine();
       if (h === "rank") loadRank();
     }
 
     window.addEventListener("hashchange", route);
-
-    // ✅ Ha OAuth callback parammal jövünk vissza, tiszta URL + #login
-    (function handleAuthCallback(){
-      const p = new URLSearchParams(window.location.search);
-      if (p.get("auth_callback") === "1") {
-        history.replaceState({}, document.title, window.location.pathname + "#login");
-      }
-    })();
-
     route();
 
-    // ✅ Supabase teszt
+    // ✅ 1) Supabase kapcsolat teszt (most már tényleg csinál is valamit)
     async function testSupabase(){
       const out = document.getElementById("login-output");
-      if (out) out.textContent = "⏳ Supabase ping...";
+      if (out) out.textContent = "⏳ Supabase kapcsolat teszt indul...";
+
       try{
         const { data, error } = await supabaseClient.auth.getSession();
-        if (error) throw error;
-        if (out) out.textContent = "✅ Supabase OK. Session: " + (data?.session ? "van" : "nincs");
+
+        if (error){
+          if (out) out.textContent = "❌ Auth hiba: " + error.message;
+          return;
+        }
+
+        const session = data?.session;
+        if (session?.user){
+          const user = session.user;
+          const name = user.user_metadata?.user_name || user.email || user.id;
+          if (out) out.textContent = "✅ Supabase OK | Bejelentkezve: " + name;
+        } else {
+          if (out) out.textContent = "✅ Supabase OK | Nincs aktív session (nem vagy belépve).";
+        }
+
+        await refreshHomeAuthLine();
       }catch(e){
-        if (out) out.textContent = "❌ Supabase hiba: " + (e?.message || e);
+        if (out) out.textContent = "❌ Kivétel: " + (e?.message || String(e));
       }
-      refreshHomeAuthLine();
-      refreshLoginLine();
     }
 
-    // ✅ GitHub OAuth belépés – EGYETLEN helyes függvény
+    // ✅ 2) GitHub OAuth belépés (EGYETLEN helyen)
     async function loginWithGithub(){
       const out = document.getElementById("login-output");
       if (out) out.textContent = "⏳ GitHub belépés indítása...";
 
-      // GitHub Pages project site -> ide jöjjön vissza
-      const redirectTo = window.location.origin + "/f1-tippliga/?auth_callback=1";
+      // GitHub Pages + hash routing: vissza a #login oldalra
+      const redirectTo = "https://zsuliettcsombok-bot.github.io/f1-tippliga/#login";
 
       const { error } = await supabaseClient.auth.signInWithOAuth({
         provider: "github",
@@ -302,34 +305,69 @@
       if (error && out) out.textContent = "❌ GitHub login hiba: " + error.message;
     }
 
-    // ✅ Kijelentkezés
+    // ✅ 3) Kijelentkezés
     async function logout(){
       const out = document.getElementById("login-output");
       if (out) out.textContent = "⏳ Kijelentkezés...";
+
       const { error } = await supabaseClient.auth.signOut();
-      if (error && out) out.textContent = "❌ Kijelentkezés hiba: " + error.message;
-      refreshHomeAuthLine();
-      refreshLoginLine();
+      if (error){
+        if (out) out.textContent = "❌ Kijelentkezés hiba: " + error.message;
+        return;
+      }
+
+      if (out) out.textContent = "✅ Kijelentkezve.";
+      await refreshHomeAuthLine();
+    }
+
+    // ✅ 4) Kézi frissítés gomb
+    async function manualRefresh(){
+      const out = document.getElementById("login-output");
+      if (out) out.textContent = "🔄 Frissítés...";
+
+      await refreshHomeAuthLine();
+      const { data } = await supabaseClient.auth.getSession();
+      const session = data?.session;
+
+      if (session?.user){
+        const name = session.user.user_metadata?.user_name || session.user.email || session.user.id;
+        if (out) out.textContent = "✅ Frissítve | Bejelentkezve: " + name;
+      } else {
+        if (out) out.textContent = "✅ Frissítve | Nincs aktív session.";
+      }
     }
 
     // Auth állapot figyelés
-    supabaseClient.auth.onAuthStateChange((event, session) => {
-      refreshHomeAuthLine();
-      refreshLoginLine();
-
+    supabaseClient.auth.onAuthStateChange(async (event, session) => {
       const out = document.getElementById("login-output");
-      if (!out) return;
 
       if (event === "SIGNED_IN" && session?.user){
         const name = session.user.user_metadata?.user_name || session.user.email || session.user.id;
-        out.textContent = "✅ Bejelentkezve: " + name;
+        if (out) out.textContent = "✅ Bejelentkezve: " + name;
       }
 
       if (event === "SIGNED_OUT"){
-        out.textContent = "ℹ️ Kijelentkezve";
+        if (out) out.textContent = "ℹ️ Kijelentkezve";
       }
+
+      await refreshHomeAuthLine();
     });
 
+    // Oldal betöltésekor: session ellenőrzés
+    (async () => {
+      const { data } = await supabaseClient.auth.getSession();
+      const session = data?.session;
+      const out = document.getElementById("login-output");
+
+      if (out && session?.user){
+        const name = session.user.user_metadata?.user_name || session.user.email || session.user.id;
+        out.textContent = "✅ Már be vagy lépve: " + name;
+      }
+
+      await refreshHomeAuthLine();
+    })();
+
+    // Home státusz sor frissítése
     async function refreshHomeAuthLine(){
       const el = document.getElementById("home-auth-line");
       if (!el) return;
@@ -345,24 +383,7 @@
       }
     }
 
-    async function refreshLoginLine(){
-      const el = document.getElementById("login-output");
-      if (!el) return;
-
-      const { data } = await supabaseClient.auth.getSession();
-      const session = data?.session;
-
-      if (session?.user){
-        const name = session.user.user_metadata?.user_name || session.user.email || session.user.id;
-        el.textContent = "✅ Már be vagy lépve: " + name;
-      } else {
-        if (!el.textContent || el.textContent.startsWith("✅") || el.textContent.startsWith("Készen")) {
-          el.textContent = "Készen áll.";
-        }
-      }
-    }
-
-    async function loadRank(){
+    function loadRank(){
       const el = document.getElementById("rank-output");
       if (!el) return;
       el.textContent = "MVP: ranglista még nincs implementálva (DB táblák + pontozás következik).";
