@@ -204,6 +204,7 @@
           <button class="btn primary" onclick="testSupabase()">✅ Supabase kapcsolat teszt</button>
           <button class="btn" onclick="loginWithGithub()">🐙 GitHub belépés</button>
           <button class="btn" onclick="goto('#home')">⬅️ Vissza</button>
+          <button class="btn" onclick="logout()" style="display:none" id="btn-logout">🚪 Kijelentkezés</button>
         </div>
 
         <div id="login-output" class="line muted">Készen áll.</div>
@@ -216,16 +217,20 @@
   <!-- ===================== SUPABASE + AUTH (TELJES) ===================== -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
-    // ✅ A TE MAI, JAVÍTOTT ADATAID
+    // ✅ A TE ADATAID
     const SUPABASE_URL = "https://mtobtiwoiqqxdkduvjmf.supabase.co";
     const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im10b2J0aXdvaXFxeGRrZHV2am1mIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjgxMTY2NzAsImV4cCI6MjA4MzY5MjY3MH0.qB5tb9uj2GN4iKRvyZnv_lVRZ9xnlgtY3rN6oZV_LDc";
 
-    // ✅ KRITIKUS: session perzisztálás localStorage-be (különben elvész és "visszadob")
+    // ✅ GitHub Pages base URL (PONTOS)
+    const APP_URL = "https://zsuliettcsombok-bot.github.io/f1-tippliga/";
+
+    // ✅ KRITIKUS: PKCE flow (nem #access_token hash), és session localStorage-ben
     const supabaseClient = window.supabase.createClient(
       SUPABASE_URL,
       SUPABASE_ANON_KEY,
       {
         auth: {
+          flowType: "pkce",
           persistSession: true,
           autoRefreshToken: true,
           storage: window.localStorage
@@ -234,9 +239,7 @@
     );
 
     // Hash navigáció
-    function goto(hash){
-      location.hash = hash;
-    }
+    function goto(hash){ location.hash = hash; }
 
     function showView(name){
       const views = ["home","rules","scoring","rank","login"];
@@ -250,79 +253,102 @@
       const h = (location.hash || "#home").replace("#","");
       const valid = new Set(["home","rules","scoring","rank","login"]);
       showView(valid.has(h) ? h : "home");
-
-      // mindig frissítsük a státuszt, hogy lásd mi van
       refreshHomeAuthLine();
       if (h === "rank") loadRank();
     }
 
     window.addEventListener("hashchange", route);
-    route();
 
-    // ✅ Supabase teszt
-    async function loginWithGitHub(){
-  const out = document.getElementById("login-output");
-  if (out) out.textContent = "⏳ GitHub belépés indítása...";
+    // ✅ Supabase teszt (a gomb ezt hívja)
+    async function testSupabase(){
+      const out = document.getElementById("login-output");
+      try{
+        out.textContent = "⏳ Supabase teszt...";
+        const { data, error } = await supabaseClient.auth.getSession();
+        if (error) throw error;
+        out.textContent = "✅ Supabase OK. Session van? " + (data?.session ? "IGEN" : "NINCS");
+      }catch(e){
+        out.textContent = "❌ Supabase teszt hiba: " + (e?.message || e);
+      }
+    }
 
-  const redirectTo = "https://zsuliettcsombok-bot.github.io/f1-tippliga/";
+    // ✅ EGYETLEN helyes GitHub login
+    async function loginWithGithub(){
+      const out = document.getElementById("login-output");
+      if (out) out.textContent = "⏳ GitHub belépés indítása...";
 
-  const { error } = await supabaseClient.auth.signInWithOAuth({
-    provider: "github",
-    options: { redirectTo }
-  });
+      // PKCE esetén ide code parammal jön vissza, nem access_token hash-sel.
+      const redirectTo = APP_URL; // NE tegyél rá ?auth_callback=1-et és ne hash-ezz
 
-  if (error && out) out.textContent = "❌ GitHub login hiba: " + error.message;
-}
+      const { error } = await supabaseClient.auth.signInWithOAuth({
+        provider: "github",
+        options: { redirectTo }
+      });
 
+      if (error && out) out.textContent = "❌ GitHub login hiba: " + error.message;
+    }
 
-    // ✅ GitHub OAuth belépés – FONTOS: #login-ra jöjjön vissza
-   async function loginWithGithub(){
-  const out = document.getElementById("login-output");
-  if (out) out.textContent = "⏳ GitHub belépés indítása...";
+    async function logout(){
+      const out = document.getElementById("login-output");
+      const { error } = await supabaseClient.auth.signOut();
+      if (error){
+        if (out) out.textContent = "❌ Kijelentkezés hiba: " + error.message;
+      } else {
+        if (out) out.textContent = "ℹ️ Kijelentkezve";
+        goto("#login");
+        refreshHomeAuthLine();
+      }
+    }
 
-  const redirectTo = window.location.origin + "/f1-tippliga/?auth_callback=1";
+    // ✅ OAuth callback kezelése (PKCE): ?code=... -> exchange -> URL takarítás
+    async function handleOAuthCallbackIfAny(){
+      const url = new URL(window.location.href);
+      const code = url.searchParams.get("code");
+      const errorDesc = url.searchParams.get("error_description") || url.searchParams.get("error");
 
-  const { error } = await supabaseClient.auth.signInWithOAuth({
-    provider: "github",
-    options: { redirectTo }
-  });
+      // Ha hibával jött vissza:
+      if (errorDesc){
+        const out = document.getElementById("login-output");
+        if (out) out.textContent = "❌ OAuth hiba: " + errorDesc;
+        // takarítunk, hogy ne ragadjon be
+        url.search = "";
+        history.replaceState({}, "", url.toString());
+        return;
+      }
 
-  if (error && out) out.textContent = "❌ GitHub login hiba: " + error.message;
-}
-
+      // Ha van code, cseréljük sessionre
+      if (code){
+        try{
+          await supabaseClient.auth.exchangeCodeForSession(window.location.href);
+        }catch(e){
+          console.error("exchangeCodeForSession error:", e);
+        }
+        // takarítás: szedd le a ?code=... részt
+        url.search = "";
+        history.replaceState({}, "", url.toString());
+        // menjünk loginra, hogy lásd a státuszt
+        if (!location.hash) location.hash = "#login";
+      }
+    }
 
     // Auth állapot figyelés
     supabaseClient.auth.onAuthStateChange((event, session) => {
       const out = document.getElementById("login-output");
+      const btnLogout = document.getElementById("btn-logout");
 
       if (event === "SIGNED_IN" && session?.user){
         const name = session.user.user_metadata?.user_name || session.user.email || session.user.id;
         if (out) out.textContent = "✅ Bejelentkezve: " + name;
-
-        // Direkt NEM dobunk át #home-ra, hogy lásd a zöld szöveget a login oldalon.
-        // Ha már stabil, majd visszakapcsoljuk:
-        // goto("#home");
-
+        if (btnLogout) btnLogout.style.display = "inline-block";
         refreshHomeAuthLine();
       }
 
       if (event === "SIGNED_OUT"){
         if (out) out.textContent = "ℹ️ Kijelentkezve";
+        if (btnLogout) btnLogout.style.display = "none";
         refreshHomeAuthLine();
       }
     });
-
-    // Oldal betöltésekor: session ellenőrzés
-    (async () => {
-      const { data } = await supabaseClient.auth.getSession();
-      const session = data?.session;
-      const out = document.getElementById("login-output");
-      if (out && session?.user){
-        const name = session.user.user_metadata?.user_name || session.user.email || session.user.id;
-        out.textContent = "✅ Már be vagy lépve: " + name;
-      }
-      refreshHomeAuthLine();
-    })();
 
     async function refreshHomeAuthLine(){
       const el = document.getElementById("home-auth-line");
@@ -330,6 +356,9 @@
 
       const { data } = await supabaseClient.auth.getSession();
       const session = data?.session;
+
+      const btnLogout = document.getElementById("btn-logout");
+      if (btnLogout) btnLogout.style.display = session?.user ? "inline-block" : "none";
 
       if (session?.user){
         const name = session.user.user_metadata?.user_name || session.user.email || session.user.id;
@@ -344,6 +373,29 @@
       if (!el) return;
       el.textContent = "MVP: ranglista még nincs implementálva (DB táblák + pontozás következik).";
     }
+
+    // BOOT
+    (async () => {
+      await handleOAuthCallbackIfAny();
+
+      // induláskor route + session kiírás
+      route();
+
+      const { data } = await supabaseClient.auth.getSession();
+      const session = data?.session;
+      const out = document.getElementById("login-output");
+      const btnLogout = document.getElementById("btn-logout");
+
+      if (session?.user){
+        const name = session.user.user_metadata?.user_name || session.user.email || session.user.id;
+        if (out) out.textContent = "✅ Már be vagy lépve: " + name;
+        if (btnLogout) btnLogout.style.display = "inline-block";
+      } else {
+        if (btnLogout) btnLogout.style.display = "none";
+      }
+
+      refreshHomeAuthLine();
+    })();
   </script>
   <!-- ================================================================== -->
 </body>
