@@ -202,7 +202,7 @@
 
   <main class="wrap">
 
-    <!-- HOME (csak info + gomb) -->
+    <!-- HOME -->
     <section id="view-home">
       <div class="card">
         <div class="badge">🏁 MVP • Főoldal: futamlista → Tipp oldal (drag & drop)</div>
@@ -219,7 +219,7 @@
       <div class="foot">© F1 Tipp Liga 2026 • GitHub Pages • Supabase</div>
     </section>
 
-    <!-- RACES (futamlista) -->
+    <!-- RACES -->
     <section id="view-races" class="hidden">
       <div class="card">
         <h2>📅 Versenynaptár</h2>
@@ -250,7 +250,7 @@ insert into public.races (id, round, name, location, start_date, end_date) value
       <div class="foot">© F1 Tipp Liga 2026 • GitHub Pages • Supabase</div>
     </section>
 
-    <!-- PICK (külön tipp oldal) -->
+    <!-- PICK -->
     <section id="view-pick" class="hidden">
       <div class="card">
         <h2>🧲 Tipp oldal (drag & drop)</h2>
@@ -308,7 +308,7 @@ insert into public.races (id, round, name, location, start_date, end_date) value
     <section id="view-login" class="hidden">
       <div class="card">
         <h2>🚀 Belépés</h2>
-        <p class="muted">Előbb DB teszt, utána GitHub belépés. (Session mentődik localStorage-be.)</p>
+        <p class="muted">Előbb DB teszt, utána GitHub belépés. (Session mentődik, ha engedi a böngésző.)</p>
 
         <div class="actions">
           <button class="btn primary" onclick="testSupabase()">✅ Supabase kapcsolat teszt</button>
@@ -326,19 +326,33 @@ insert into public.races (id, round, name, location, start_date, end_date) value
   <!-- ===================== SUPABASE + APP ===================== -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
-    // ✅ A TE ADATAID (ezeket hagyd így)
+    // ✅ A TE ADATAID
     const SUPABASE_URL = "https://mtobtiwoiqqxdkduvjmf.supabase.co";
     const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im10b2J0aXdvaXFxeGRrZHV2am1mIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjgxMTY2NzAsImV4cCI6MjA4MzY5MjY3MH0.qB5tb9uj2GN4iKRvyZnv_lVRZ9xnlgtY3rN6oZV_LDc";
 
-    // ✅ session perzisztálás localStorage-be
+    // ---- SAFE STORAGE: Edge Tracking Prevention / InPrivate esetén a localStorage letilthat
+    function getSafeStorage() {
+      try {
+        const s = window.localStorage;
+        const k = "__sb_test__";
+        s.setItem(k, "1");
+        s.removeItem(k);
+        return s;
+      } catch (e) {
+        return null;
+      }
+    }
+    const SAFE_STORAGE = getSafeStorage();
+
+    // ✅ Supabase kliens (ha nincs storage, nem perzisztál sessiont)
     const supabaseClient = window.supabase.createClient(
       SUPABASE_URL,
       SUPABASE_ANON_KEY,
       {
         auth: {
-          persistSession: true,
-          autoRefreshToken: true,
-          storage: window.localStorage
+          persistSession: !!SAFE_STORAGE,
+          autoRefreshToken: !!SAFE_STORAGE,
+          storage: SAFE_STORAGE || undefined
         }
       }
     );
@@ -352,7 +366,6 @@ insert into public.races (id, round, name, location, start_date, end_date) value
     function goto(hash){ location.hash = hash; }
 
     function hardReload(){
-      // cache-bypass frissítés GitHub Pages-nél
       const u = new URL(window.location.href);
       u.searchParams.set("v", String(Date.now()));
       window.location.href = u.toString();
@@ -368,7 +381,6 @@ insert into public.races (id, round, name, location, start_date, end_date) value
 
     function getHashBase(){
       const h = (location.hash || "#home").replace("#","");
-      // pick route: pick?race=...
       if (h.startsWith("pick")) return "pick";
       if (h.startsWith("races")) return "races";
       if (h.startsWith("rank")) return "rank";
@@ -377,7 +389,6 @@ insert into public.races (id, round, name, location, start_date, end_date) value
     }
 
     function getQueryFromHash(){
-      // "#pick?race=XXX"
       const raw = (location.hash || "#home").slice(1);
       const qIndex = raw.indexOf("?");
       if (qIndex === -1) return new URLSearchParams();
@@ -413,13 +424,19 @@ insert into public.races (id, round, name, location, start_date, end_date) value
     async function refreshHomeAuthLine(){
       const el = document.getElementById("home-auth-line");
       if (!el) return;
-      const { data } = await supabaseClient.auth.getSession();
-      const session = data?.session;
-      if (session?.user){
-        const name = session.user.user_metadata?.user_name || session.user.email || session.user.id;
-        el.innerHTML = "🔓 Státusz: <b>bejelentkezve</b> – " + name;
-      } else {
-        el.innerHTML = "🔒 Státusz: <span class='muted'>nincs bejelentkezve</span>";
+
+      try{
+        const { data } = await supabaseClient.auth.getSession();
+        const session = data?.session;
+        if (session?.user){
+          const name = session.user.user_metadata?.user_name || session.user.email || session.user.id;
+          el.innerHTML = "🔓 Státusz: <b>bejelentkezve</b> – " + name;
+        } else {
+          el.innerHTML = "🔒 Státusz: <span class='muted'>nincs bejelentkezve</span>";
+        }
+      }catch(e){
+        // ha storage blokkolt, akkor se omoljon össze a home
+        el.innerHTML = "⚠️ Státusz: <span class='muted'>böngésző blokkolja a storage-t (InPrivate/Tracking Prevention)</span>";
       }
     }
 
@@ -427,7 +444,6 @@ insert into public.races (id, round, name, location, start_date, end_date) value
       const out = document.getElementById("login-output");
       if (out) out.textContent = "⏳ GitHub belépés indítása...";
 
-      // GitHub Pages redirect – a saját repód alá:
       const redirectTo = window.location.origin + "/f1-tippliga/?auth_callback=1";
 
       const { error } = await supabaseClient.auth.signInWithOAuth({
@@ -451,17 +467,28 @@ insert into public.races (id, round, name, location, start_date, end_date) value
       const out = document.getElementById("login-output");
       if (out) out.textContent = "⏳ Supabase teszt..." ;
 
+      const withTimeout = (p, ms = 10000) =>
+        Promise.race([
+          p,
+          new Promise((_, rej) => setTimeout(() => rej(new Error("Timeout: Supabase nem válaszolt 10 mp alatt.")), ms))
+        ]);
+
       try{
-        const races = await supabaseClient.from("races").select("*", { count:"exact", head:false }).limit(3).order("round",{ascending:true});
+        const races = await withTimeout(
+          supabaseClient.from("races").select("*", { count:"exact", head:false }).limit(3).order("round",{ascending:true})
+        );
         if (races.error) throw races.error;
 
-        const drivers = await supabaseClient.from("drivers").select("*", { count:"exact", head:false }).limit(3).order("name",{ascending:true});
+        const drivers = await withTimeout(
+          supabaseClient.from("drivers").select("*", { count:"exact", head:false }).limit(3).order("name",{ascending:true})
+        );
         if (drivers.error) throw drivers.error;
 
         out.textContent =
           "✅ Supabase OK.\n" +
           "races: " + (races.count ?? races.data?.length ?? 0) + " rekord (mutat 3-at)\n" +
-          "drivers: " + (drivers.count ?? drivers.data?.length ?? 0) + " rekord (mutat 3-at)";
+          "drivers: " + (drivers.count ?? drivers.data?.length ?? 0) + " rekord (mutat 3-at)\n\n" +
+          (SAFE_STORAGE ? "ℹ️ Storage: OK" : "⚠️ Storage: BLOKKOLVA (InPrivate/Tracking Prevention) — ez normális lehet.");
       }catch(e){
         out.textContent = "❌ Supabase teszt hiba: " + (e?.message || String(e));
       }
@@ -478,12 +505,20 @@ insert into public.races (id, round, name, location, start_date, end_date) value
       list.innerHTML = "";
       if (emptyHelp) emptyHelp.style.display = "none";
 
+      const withTimeout = (p, ms = 10000) =>
+        Promise.race([
+          p,
+          new Promise((_, rej) => setTimeout(() => rej(new Error("Timeout: a Supabase kérés nem válaszolt 10 mp alatt.")), ms))
+        ]);
+
       try{
-        const res = await supabaseClient
-          .from("races")
-          .select("id, round, name, location, start_date, end_date")
-          .order("round", { ascending:true })
-          .limit(200);
+        const res = await withTimeout(
+          supabaseClient
+            .from("races")
+            .select("id, round, name, location, start_date, end_date")
+            .order("round", { ascending:true })
+            .limit(200)
+        );
 
         if (res.error) throw res.error;
 
@@ -505,11 +540,13 @@ insert into public.races (id, round, name, location, start_date, end_date) value
           const title = document.createElement("div");
           title.className = "race-title";
           title.textContent = `#${r.round} • ${r.name || "Futam"}`;
+
           const meta = document.createElement("div");
           meta.className = "race-meta";
           const sd = r.start_date ? String(r.start_date) : "";
           const ed = r.end_date ? String(r.end_date) : "";
           meta.textContent = `${r.location || ""}${(sd||ed) ? " • " + sd + (ed ? " → " + ed : "") : ""}`;
+
           left.appendChild(title);
           left.appendChild(meta);
 
@@ -522,7 +559,10 @@ insert into public.races (id, round, name, location, start_date, end_date) value
           list.appendChild(div);
         }
       }catch(e){
-        status.textContent = "❌ Futam betöltési hiba: " + (e?.message || String(e));
+        const msg = (e?.message || String(e));
+        status.textContent =
+          "❌ Futam betöltési hiba: " + msg +
+          "\n\nTipp: Edge InPrivate / Tracking Prevention / adblock blokkolhatja a supabase hívást. Próbáld Chrome-ban vagy engedélyezd a storage/cookie-t a github.io + supabase.co-hoz.";
       }
     }
 
@@ -530,8 +570,7 @@ insert into public.races (id, round, name, location, start_date, end_date) value
     let currentRaceId = null;
     let currentRace = null;
     let driversCache = [];
-    let slots = [null,null,null,null,null]; // driver_id in positions
-    let resultSlots = [null,null,null,null,null];
+    let slots = [null,null,null,null,null];
 
     function buildSlotsUI(){
       const el = document.getElementById("slots");
@@ -569,18 +608,7 @@ insert into public.races (id, round, name, location, start_date, end_date) value
       }
     }
 
-    function buildAdminSlotsUI(){
-      const admin = document.getElementById("admin-box");
-      if (!admin || admin.classList.contains("hidden")) return;
-
-      // újrahasznosítjuk a slots UI-t: adminnál a resultSlots-t húzzuk
-      // egy egyszerű megoldás: a normál slotok alá nem csinálunk új UI-t,
-      // hanem admin mentésnél a normál slots-t tekintjük eredménynek.
-      // (Most így hagyjuk: admin ugyanazt a slots-t használja, és saveResult() ezt menti.)
-    }
-
     function setSlot(pos, driverId){
-      // ne lehessen duplán ugyanaz a pilóta
       for (let i=0; i<slots.length; i++){
         if (slots[i] === driverId) slots[i] = null;
       }
@@ -599,6 +627,7 @@ insert into public.races (id, round, name, location, start_date, end_date) value
       const q = getQueryFromHash();
       const race = q.get("race");
       currentRaceId = race;
+
       const title = document.getElementById("pick-race-title");
       const status = document.getElementById("pick-status");
       const driversEl = document.getElementById("drivers-list");
@@ -609,14 +638,13 @@ insert into public.races (id, round, name, location, start_date, end_date) value
         return;
       }
 
-      // user + admin
-      const { data: sess } = await supabaseClient.auth.getSession();
+      const { data: sess } = await supabaseClient.auth.getSession().catch(() => ({ data: null }));
       const user = sess?.session?.user || null;
+
       const isAdmin = !!(user?.email && ADMIN_EMAILS.includes(user.email));
       const adminBox = document.getElementById("admin-box");
       if (adminBox) adminBox.classList.toggle("hidden", !isAdmin);
 
-      // load race
       try{
         const rr = await supabaseClient.from("races")
           .select("id, round, name, location, start_date, end_date")
@@ -635,14 +663,11 @@ insert into public.races (id, round, name, location, start_date, end_date) value
         if (title) title.textContent = "❌ Futam betöltési hiba: " + (e?.message || String(e));
       }
 
-      // load drivers
       await loadDrivers();
 
-      // build slots
       slots = [null,null,null,null,null];
       buildSlotsUI();
 
-      // load existing pick for user
       if (user){
         await loadMyPick();
       }else{
@@ -655,12 +680,20 @@ insert into public.races (id, round, name, location, start_date, end_date) value
       const status = document.getElementById("pick-status");
       if (driversEl) driversEl.textContent = "⏳ Pilóták betöltése...";
 
+      const withTimeout = (p, ms = 10000) =>
+        Promise.race([
+          p,
+          new Promise((_, rej) => setTimeout(() => rej(new Error("Timeout: drivers lekérés 10 mp.")), ms))
+        ]);
+
       try{
-        const res = await supabaseClient
-          .from("drivers")
-          .select("id, name, team, avatar_url")
-          .order("name", { ascending:true })
-          .limit(300);
+        const res = await withTimeout(
+          supabaseClient
+            .from("drivers")
+            .select("id, name, team, avatar_url")
+            .order("name", { ascending:true })
+            .limit(300)
+        );
 
         if (res.error) throw res.error;
 
@@ -670,7 +703,6 @@ insert into public.races (id, round, name, location, start_date, end_date) value
           return;
         }
 
-        // render
         driversEl.innerHTML = "";
         for (const d of driversCache){
           const row = document.createElement("div");
@@ -691,6 +723,7 @@ insert into public.races (id, round, name, location, start_date, end_date) value
             img.alt = d.name;
             av.appendChild(img);
           }
+
           const info = document.createElement("div");
           const nm = document.createElement("div");
           nm.className = "d-name";
@@ -721,7 +754,7 @@ insert into public.races (id, round, name, location, start_date, end_date) value
 
     async function loadMyPick(){
       const status = document.getElementById("pick-status");
-      const { data } = await supabaseClient.auth.getSession();
+      const { data } = await supabaseClient.auth.getSession().catch(() => ({ data: null }));
       const user = data?.session?.user;
       if (!user || !currentRaceId) return;
 
@@ -736,13 +769,7 @@ insert into public.races (id, round, name, location, start_date, end_date) value
         if (res.error) throw res.error;
 
         if (res.data){
-          slots = [
-            res.data.p1 || null,
-            res.data.p2 || null,
-            res.data.p3 || null,
-            res.data.p4 || null,
-            res.data.p5 || null
-          ];
+          slots = [res.data.p1, res.data.p2, res.data.p3, res.data.p4, res.data.p5].map(x => x || null);
           buildSlotsUI();
           if (status) status.textContent = "✅ Korábbi tipped betöltve.";
         }else{
@@ -755,7 +782,7 @@ insert into public.races (id, round, name, location, start_date, end_date) value
 
     async function savePick(){
       const status = document.getElementById("pick-status");
-      const { data } = await supabaseClient.auth.getSession();
+      const { data } = await supabaseClient.auth.getSession().catch(() => ({ data: null }));
       const user = data?.session?.user;
 
       if (!user){
@@ -782,7 +809,6 @@ insert into public.races (id, round, name, location, start_date, end_date) value
           updated_at: new Date().toISOString()
         };
 
-        // upsert: kell hozzá UNIQUE(user_id, race_id) a picks táblán
         const res = await supabaseClient
           .from("picks")
           .upsert(payload, { onConflict: "user_id,race_id" });
@@ -800,7 +826,7 @@ insert into public.races (id, round, name, location, start_date, end_date) value
 
     async function saveResult(){
       const adminStatus = document.getElementById("admin-status");
-      const { data } = await supabaseClient.auth.getSession();
+      const { data } = await supabaseClient.auth.getSession().catch(() => ({ data: null }));
       const user = data?.session?.user;
 
       const isAdmin = !!(user?.email && ADMIN_EMAILS.includes(user.email));
@@ -843,10 +869,6 @@ insert into public.races (id, round, name, location, start_date, end_date) value
 
     // --------- rank (MVP pontozás) ----------
     function calcPoints(picksRow, resultRow){
-      // Pontozás:
-      // - pontos helyezés: 3
-      // - top5-ben benne, de máshol: 1
-      // - nincs top5-ben: 0
       const p = [picksRow.p1, picksRow.p2, picksRow.p3, picksRow.p4, picksRow.p5];
       const r = [resultRow.r1, resultRow.r2, resultRow.r3, resultRow.r4, resultRow.r5];
 
@@ -864,12 +886,10 @@ insert into public.races (id, round, name, location, start_date, end_date) value
       if (out) out.textContent = "⏳ Betöltés...";
 
       try{
-        // results
         const resR = await supabaseClient.from("results").select("race_id,r1,r2,r3,r4,r5");
         if (resR.error) throw resR.error;
         const results = resR.data || [];
 
-        // picks
         const resP = await supabaseClient.from("picks").select("user_id,race_id,p1,p2,p3,p4,p5");
         if (resP.error) throw resP.error;
         const picks = resP.data || [];
@@ -880,7 +900,6 @@ insert into public.races (id, round, name, location, start_date, end_date) value
           return;
         }
 
-        // map results by race
         const byRace = new Map(results.map(r => [r.race_id, r]));
         const scoreByUser = new Map();
 
@@ -901,7 +920,6 @@ insert into public.races (id, round, name, location, start_date, end_date) value
           return;
         }
 
-        // pretty render
         let txt = "🏆 Ranglista (MVP)\n\n";
         rows.forEach((r, idx) => {
           const short = r.user_id ? (r.user_id.slice(0,8) + "…") : "ismeretlen";
@@ -917,17 +935,13 @@ insert into public.races (id, round, name, location, start_date, end_date) value
 
     // --------- init ----------
     (async () => {
-      // auth callback után ne maradjon ott a query param (szépítés)
       if (window.location.search.includes("auth_callback=1")){
         const u = new URL(window.location.href);
         u.searchParams.delete("auth_callback");
-        // nem veszítünk sessiont, csak URL-t tisztítunk:
         window.history.replaceState({}, "", u.pathname + u.hash);
       }
-
       await route();
     })();
   </script>
-  <!-- ========================================================= -->
 </body>
 </html>
