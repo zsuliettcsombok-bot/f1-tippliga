@@ -118,6 +118,7 @@
     }
     .foot{margin-top:18px; text-align:center; color:#bdbdbd; opacity:.9; font-size:14px;}
 
+    /* ====== Verseny lista ====== */
     .race-list{display:flex; flex-direction:column; gap:10px; position:relative; z-index:1;}
     .race-item{
       display:flex; align-items:center; justify-content:space-between; gap:12px;
@@ -131,6 +132,7 @@
     .race-title{font-weight:900;}
     .race-meta{color:var(--muted); font-weight:700; font-size:13px;}
 
+    /* ====== Pick page layout ====== */
     .grid{display:grid; grid-template-columns: 1.1fr .9fr; gap:14px; position:relative; z-index:1;}
     @media(max-width: 980px){ .grid{grid-template-columns:1fr;} }
 
@@ -200,6 +202,7 @@
 
   <main class="wrap">
 
+    <!-- HOME (csak info + gomb) -->
     <section id="view-home">
       <div class="card">
         <div class="badge">🏁 MVP • Főoldal: futamlista → Tipp oldal (drag & drop)</div>
@@ -216,6 +219,7 @@
       <div class="foot">© F1 Tipp Liga 2026 • GitHub Pages • Supabase</div>
     </section>
 
+    <!-- RACES (futamlista) -->
     <section id="view-races" class="hidden">
       <div class="card">
         <h2>📅 Versenynaptár</h2>
@@ -246,6 +250,7 @@ insert into public.races (id, round, name, location, start_date, end_date) value
       <div class="foot">© F1 Tipp Liga 2026 • GitHub Pages • Supabase</div>
     </section>
 
+    <!-- PICK (külön tipp oldal) -->
     <section id="view-pick" class="hidden">
       <div class="card">
         <h2>🧲 Tipp oldal (drag & drop)</h2>
@@ -254,6 +259,7 @@ insert into public.races (id, round, name, location, start_date, end_date) value
         <div class="actions" style="margin-top:12px;">
           <button class="btn" onclick="goto('#races')">⬅️ Vissza a futamokhoz</button>
           <button class="btn" onclick="clearSlots()">🧹 Törlés</button>
+          <button class="btn" onclick="deletePick()">🗑 Tipp törlése</button>
           <button class="btn primary" onclick="savePick()">💾 Tipp mentése</button>
         </div>
 
@@ -284,6 +290,7 @@ insert into public.races (id, round, name, location, start_date, end_date) value
       <div class="foot">© F1 Tipp Liga 2026 • GitHub Pages • Supabase</div>
     </section>
 
+    <!-- RANK -->
     <section id="view-rank" class="hidden">
       <div class="card">
         <h2>📊 Ranglista (MVP)</h2>
@@ -298,10 +305,11 @@ insert into public.races (id, round, name, location, start_date, end_date) value
       <div class="foot">© F1 Tipp Liga 2026 • GitHub Pages • Supabase</div>
     </section>
 
+    <!-- LOGIN -->
     <section id="view-login" class="hidden">
       <div class="card">
         <h2>🚀 Belépés</h2>
-        <p class="muted">Előbb DB teszt, utána GitHub belépés.</p>
+        <p class="muted">Előbb DB teszt, utána GitHub belépés. (Session mentődik localStorage-be.)</p>
 
         <div class="actions">
           <button class="btn primary" onclick="testSupabase()">✅ Supabase kapcsolat teszt</button>
@@ -316,17 +324,12 @@ insert into public.races (id, round, name, location, start_date, end_date) value
     </section>
   </main>
 
+  <!-- ===================== SUPABASE + APP ===================== -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
+    // ✅ A TE ADATAID
     const SUPABASE_URL = "https://mtobtiwoiqqxdkduvjmf.supabase.co";
     const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im10b2J0aXdvaXFxeGRrZHV2am1mIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjgxMTY2NzAsImV4cCI6MjA4MzY5MjY3MH0.qB5tb9uj2GN4iKRvyZnv_lVRZ9xnlgtY3rN6oZV_LDc";
-
-    // ✅ InPrivate / Tracking Prevention kompatibilis storage (memória)
-    const memoryStorage = {
-      getItem: (key) => memoryStorage[key] ?? null,
-      setItem: (key, value) => { memoryStorage[key] = value; },
-      removeItem: (key) => { delete memoryStorage[key]; }
-    };
 
     const supabaseClient = window.supabase.createClient(
       SUPABASE_URL,
@@ -335,12 +338,12 @@ insert into public.races (id, round, name, location, start_date, end_date) value
         auth: {
           persistSession: true,
           autoRefreshToken: true,
-          detectSessionInUrl: true,
-          storage: memoryStorage
+          storage: window.localStorage
         }
       }
     );
 
+    // ✅ ADMIN: ha kell majd eredmény mentéshez
     const ADMIN_EMAILS = [
       // "te@valami.hu"
     ];
@@ -418,6 +421,7 @@ insert into public.races (id, round, name, location, start_date, end_date) value
     async function loginWithGithub(){
       const out = document.getElementById("login-output");
       if (out) out.textContent = "⏳ GitHub belépés indítása...";
+
       const redirectTo = window.location.origin + "/f1-tippliga/?auth_callback=1";
 
       const { error } = await supabaseClient.auth.signInWithOAuth({
@@ -438,7 +442,7 @@ insert into public.races (id, round, name, location, start_date, end_date) value
 
     async function testSupabase(){
       const out = document.getElementById("login-output");
-      if (out) out.textContent = "⏳ Supabase teszt...";
+      if (out) out.textContent = "⏳ Supabase teszt..." ;
 
       try{
         const races = await supabaseClient.from("races").select("*", { count:"exact", head:false }).limit(3).order("round",{ascending:true});
@@ -456,21 +460,6 @@ insert into public.races (id, round, name, location, start_date, end_date) value
       }
     }
 
-    // timeout wrapper a fetch jellegű hibákra
-    async function withTimeout(promise, ms){
-      const controller = new AbortController();
-      const t = setTimeout(() => controller.abort(), ms);
-      try{
-        // supabase-js nem mindig ad át signal-t, de legalább a saját kódban egységesíthetjük a hibát
-        const res = await promise;
-        clearTimeout(t);
-        return res;
-      }catch(e){
-        clearTimeout(t);
-        throw e;
-      }
-    }
-
     async function loadRaces(force){
       const status = document.getElementById("races-status");
       const list = document.getElementById("races-list");
@@ -482,15 +471,11 @@ insert into public.races (id, round, name, location, start_date, end_date) value
       if (emptyHelp) emptyHelp.style.display = "none";
 
       try{
-        // 10 mp timeout
-        const res = await withTimeout(
-          supabaseClient
-            .from("races")
-            .select("id, round, name, location, start_date, end_date")
-            .order("round", { ascending:true })
-            .limit(200),
-          10000
-        );
+        const res = await supabaseClient
+          .from("races")
+          .select("id, round, name, location, start_date, end_date")
+          .order("round", { ascending:true })
+          .limit(200);
 
         if (res.error) throw res.error;
 
@@ -529,18 +514,11 @@ insert into public.races (id, round, name, location, start_date, end_date) value
           list.appendChild(div);
         }
       }catch(e){
-        const msg = (e?.message || String(e));
-        if (String(msg).toLowerCase().includes("abort") || String(msg).toLowerCase().includes("timeout")){
-          status.textContent =
-            "❌ Futam betöltési hiba: Timeout: a Supabase kérés nem válaszolt 10 mp alatt.\n\n" +
-            "Tipp: Edge InPrivate / Tracking Prevention / adblock blokkolhatja a supabase hívást.\n" +
-            "Próbáld Chrome-ban vagy engedélyezd a storage/cookie-t a github.io + supabase.co-hoz.";
-        }else{
-          status.textContent = "❌ Futam betöltési hiba: " + msg;
-        }
+        status.textContent = "❌ Futam betöltési hiba: " + (e?.message || String(e));
       }
     }
 
+    // --------- pick state ----------
     let currentRaceId = null;
     let currentRace = null;
     let driversCache = [];
@@ -594,7 +572,7 @@ insert into public.races (id, round, name, location, start_date, end_date) value
       slots = [null,null,null,null,null];
       buildSlotsUI();
       const st = document.getElementById("pick-status");
-      if (st) st.textContent = "🧹 Törölve.";
+      if (st) st.textContent = "🧹 Törölve (csak képernyőn).";
     }
 
     async function openPickFromHash(){
@@ -636,6 +614,7 @@ insert into public.races (id, round, name, location, start_date, end_date) value
       }
 
       await loadDrivers();
+
       slots = [null,null,null,null,null];
       buildSlotsUI();
 
@@ -790,6 +769,40 @@ insert into public.races (id, round, name, location, start_date, end_date) value
           "❌ Mentési hiba: " + msg +
           "\n\nHa azt írja, hogy nincs onConflict / unique constraint, akkor kell a DB-be: UNIQUE(user_id, race_id) a picks táblára.";
       }
+    }
+
+    // ✅ ÚJ: DB-s törlés (nem csak UI törlés)
+    async function deletePick(){
+      const status = document.getElementById("pick-status");
+      const { data } = await supabaseClient.auth.getSession();
+      const user = data?.session?.user;
+
+      if (!user){
+        if (status) status.textContent = "⚠️ Törléshez is be kell jelentkezni.";
+        goto("#login");
+        return;
+      }
+      if (!currentRaceId){
+        if (status) status.textContent = "⚠️ Nincs futam kiválasztva.";
+        return;
+      }
+
+      if (status) status.textContent = "⏳ Tipp törlése...";
+
+      const res = await supabaseClient
+        .from("picks")
+        .delete()
+        .eq("user_id", user.id)
+        .eq("race_id", currentRaceId);
+
+      if (res.error){
+        if (status) status.textContent = "❌ Törlési hiba: " + res.error.message;
+        return;
+      }
+
+      slots = [null,null,null,null,null];
+      buildSlotsUI();
+      if (status) status.textContent = "✅ Tipp törölve a DB-ből is.";
     }
 
     async function saveResult(){
