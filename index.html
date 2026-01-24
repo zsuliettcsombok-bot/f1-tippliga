@@ -118,7 +118,6 @@
     }
     .foot{margin-top:18px; text-align:center; color:#bdbdbd; opacity:.9; font-size:14px;}
 
-    /* ====== Verseny lista ====== */
     .race-list{display:flex; flex-direction:column; gap:10px; position:relative; z-index:1;}
     .race-item{
       display:flex; align-items:center; justify-content:space-between; gap:12px;
@@ -132,7 +131,6 @@
     .race-title{font-weight:900;}
     .race-meta{color:var(--muted); font-weight:700; font-size:13px;}
 
-    /* ====== Pick page layout ====== */
     .grid{display:grid; grid-template-columns: 1.1fr .9fr; gap:14px; position:relative; z-index:1;}
     @media(max-width: 980px){ .grid{grid-template-columns:1fr;} }
 
@@ -178,8 +176,17 @@
     .d-name{font-weight:900;}
     .d-team{color:var(--muted); font-weight:800; font-size:12px;}
 
-    .admin-box{margin-top:14px;}
-    .admin-title{font-weight:900; margin-bottom:6px;}
+    .config-row{display:flex; gap:10px; flex-wrap:wrap; margin-top:10px;}
+    .inp{
+      flex:1 1 280px;
+      padding:10px 12px;
+      border-radius:12px;
+      border:1px solid rgba(255,255,255,.12);
+      background:rgba(0,0,0,.25);
+      color:#fff;
+      outline:none;
+    }
+    .small{font-size:13px;}
   </style>
 </head>
 
@@ -190,7 +197,6 @@
         <span class="brand-pill">F1</span>
         <span>2026 TIPP LIGA</span>
       </div>
-
       <nav class="nav">
         <a href="#home">Kezdő</a>
         <a href="#races">Versenynaptár</a>
@@ -202,10 +208,9 @@
 
   <main class="wrap">
 
-    <!-- HOME (csak info + gomb) -->
     <section id="view-home">
       <div class="card">
-        <div class="badge">🏁 MVP • Főoldal: futamlista → Tipp oldal (drag & drop)</div>
+        <div class="badge">🏁 MVP • Futamlista → Tipp oldal (drag & drop)</div>
         <h1>F1 2026 Tipp Liga</h1>
         <p class="lead">Főoldalon futamnaptár. Futamot kiválasztva külön Tipp oldalon húzod be az 1–5. helyre a pilótákat. Mentés Supabase-be.</p>
         <div class="actions">
@@ -219,7 +224,6 @@
       <div class="foot">© F1 Tipp Liga 2026 • GitHub Pages • Supabase</div>
     </section>
 
-    <!-- RACES (futamlista) -->
     <section id="view-races" class="hidden">
       <div class="card">
         <h2>📅 Versenynaptár</h2>
@@ -232,25 +236,10 @@
 
         <div class="line" id="races-status">Betöltés...</div>
         <div class="race-list" id="races-list" style="margin-top:12px;"></div>
-
-        <div class="line" id="races-empty-help" style="display:none; margin-top:14px;">
-⚠️ Nincs futam adat a <b>races</b> táblában.
-
-Mit tegyél:
-1) Supabase → SQL Editor
-2) Illeszd be az alábbi MINTA INSERT-et (csak demo), majd Run.
-3) Utána itt nyomj: “Lista frissítése”.
-
-MINTA (demo) SQL:
-insert into public.races (id, round, name, location, start_date, end_date) values
-(gen_random_uuid(), 1, 'Demo GP 1', 'Demo City', '2026-03-01', '2026-03-03'),
-(gen_random_uuid(), 2, 'Demo GP 2', 'Demo City', '2026-03-15', '2026-03-17');
-        </div>
       </div>
       <div class="foot">© F1 Tipp Liga 2026 • GitHub Pages • Supabase</div>
     </section>
 
-    <!-- PICK (külön tipp oldal) -->
     <section id="view-pick" class="hidden">
       <div class="card">
         <h2>🧲 Tipp oldal (drag & drop)</h2>
@@ -267,16 +256,6 @@ insert into public.races (id, round, name, location, start_date, end_date) value
           <div class="panel">
             <div style="font-weight:900;">Helyezések (1–5)</div>
             <div class="slots" id="slots"></div>
-
-            <div class="admin-box hidden" id="admin-box">
-              <div class="admin-title">🔧 Admin – Eredmény (Top5) rögzítése</div>
-              <div class="muted">Ugyanaz a drag&drop: húzd be az 1–5 helyre, majd mentés.</div>
-              <div class="actions" style="margin-top:10px;">
-                <button class="btn primary" onclick="saveResult()">✅ Eredmény mentése (admin)</button>
-              </div>
-              <div class="line" id="admin-status">Admin kész.</div>
-            </div>
-
             <div class="line" id="pick-status">Készen áll.</div>
           </div>
 
@@ -290,11 +269,10 @@ insert into public.races (id, round, name, location, start_date, end_date) value
       <div class="foot">© F1 Tipp Liga 2026 • GitHub Pages • Supabase</div>
     </section>
 
-    <!-- RANK -->
     <section id="view-rank" class="hidden">
       <div class="card">
         <h2>📊 Ranglista (MVP)</h2>
-        <p class="muted">Most MVP: összes tipp + eredmények alapján pontszámolás. (Nevek később profil táblával lesznek szépek.)</p>
+        <p class="muted">Összes tipp + eredmények alapján pontszámolás. (MVP: user_id rövidítve.)</p>
         <div class="actions" style="margin-top:12px;">
           <button class="btn" onclick="goto('#home')">⬅️ Vissza</button>
           <button class="btn primary" onclick="loadRank(true)">🔄 Ranglista frissítése</button>
@@ -305,13 +283,27 @@ insert into public.races (id, round, name, location, start_date, end_date) value
       <div class="foot">© F1 Tipp Liga 2026 • GitHub Pages • Supabase</div>
     </section>
 
-    <!-- LOGIN -->
     <section id="view-login" class="hidden">
       <div class="card">
         <h2>🚀 Belépés</h2>
-        <p class="muted">Előbb DB teszt, utána GitHub belépés. (Session mentődik localStorage-be.)</p>
+        <p class="muted">Előbb Supabase kapcsolat, utána GitHub belépés. (Session mentődik localStorage-be.)</p>
 
-        <div class="actions">
+        <div class="panel">
+          <div style="font-weight:900;">🔧 Supabase beállítás (csak egyszer)</div>
+          <div class="muted small">Ha ma “elszállt” / nem válaszol: itt újra megadhatod a Supabase URL-t és ANON KEY-t. Ezt a böngésző elmenti localStorage-be. Nem kerül a chatbe.</div>
+          <div class="config-row">
+            <input class="inp" id="cfg-url" placeholder="SUPABASE_URL (https://...supabase.co)" />
+            <input class="inp" id="cfg-key" placeholder="SUPABASE_ANON_KEY (eyJ...)" />
+          </div>
+          <div class="actions" style="margin-top:10px;">
+            <button class="btn" onclick="saveConfig()">💾 Mentés a böngészőbe</button>
+            <button class="btn" onclick="clearConfig()">🧹 Törlés (reset)</button>
+            <button class="btn primary" onclick="reinitSupabase()">♻️ Újrainicializálás</button>
+          </div>
+          <div class="line" id="cfg-status">Készen áll.</div>
+        </div>
+
+        <div class="actions" style="margin-top:12px;">
           <button class="btn primary" onclick="testSupabase()">✅ Supabase kapcsolat teszt</button>
           <button class="btn" onclick="loginWithGithub()">🐙 GitHub belépés</button>
           <button class="btn" onclick="logout()">🚪 Kijelentkezés</button>
@@ -324,30 +316,85 @@ insert into public.races (id, round, name, location, start_date, end_date) value
     </section>
   </main>
 
-  <!-- ===================== SUPABASE + APP ===================== -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
-    // ✅ A TE ADATAID
-    const SUPABASE_URL = "https://mtobtiwoiqqxdkduvjmf.supabase.co";
-    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im10b2J0aXdvaXFxeGRrZHV2am1mIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjgxMTY2NzAsImV4cCI6MjA4MzY5MjY3MH0.qB5tb9uj2GN4iKRvyZnv_lVRZ9xnlgtY3rN6oZV_LDc";
+    // ====== Supabase config (nem kell a fájlban kulcsot őrizgetni) ======
+    const LS_URL_KEY = "F1_SUPABASE_URL";
+    const LS_ANON_KEY = "F1_SUPABASE_ANON_KEY";
 
-    const supabaseClient = window.supabase.createClient(
-      SUPABASE_URL,
-      SUPABASE_ANON_KEY,
-      {
-        auth: {
-          persistSession: true,
-          autoRefreshToken: true,
-          storage: window.localStorage
-        }
+    // Ha te akarsz fixen a fájlban tartani értéket, ide beírhatod később.
+    // Most szándékosan üres: a böngészőből fogjuk tölteni.
+    let SUPABASE_URL = "";
+    let SUPABASE_ANON_KEY = "";
+
+    function loadConfigIntoVars(){
+      const u = (window.localStorage.getItem(LS_URL_KEY) || "").trim();
+      const k = (window.localStorage.getItem(LS_ANON_KEY) || "").trim();
+      SUPABASE_URL = u || SUPABASE_URL;
+      SUPABASE_ANON_KEY = k || SUPABASE_ANON_KEY;
+    }
+
+    function fillConfigUI(){
+      const u = document.getElementById("cfg-url");
+      const k = document.getElementById("cfg-key");
+      if (u) u.value = window.localStorage.getItem(LS_URL_KEY) || "";
+      if (k) k.value = window.localStorage.getItem(LS_ANON_KEY) || "";
+    }
+
+    function saveConfig(){
+      const u = (document.getElementById("cfg-url")?.value || "").trim();
+      const k = (document.getElementById("cfg-key")?.value || "").trim();
+      const st = document.getElementById("cfg-status");
+      if (!u || !k){
+        if (st) st.textContent = "⚠️ Add meg mindkettőt (URL + ANON KEY), különben nem tud csatlakozni.";
+        return;
       }
-    );
+      window.localStorage.setItem(LS_URL_KEY, u);
+      window.localStorage.setItem(LS_ANON_KEY, k);
+      if (st) st.textContent = "✅ Elmentve localStorage-be.";
+    }
 
-    // ✅ ADMIN: ha kell majd eredmény mentéshez
-    const ADMIN_EMAILS = [
-      // "zoltan.csombok@hellmann.com"
-    ];
+    function clearConfig(){
+      window.localStorage.removeItem(LS_URL_KEY);
+      window.localStorage.removeItem(LS_ANON_KEY);
+      fillConfigUI();
+      const st = document.getElementById("cfg-status");
+      if (st) st.textContent = "🧹 Törölve. Most újra be kell írni.";
+    }
 
+    // ====== Supabase client init ======
+    let supabaseClient = null;
+
+    function initSupabase(){
+      loadConfigIntoVars();
+      if (!SUPABASE_URL || !SUPABASE_ANON_KEY){
+        supabaseClient = null;
+        return;
+      }
+      supabaseClient = window.supabase.createClient(
+        SUPABASE_URL,
+        SUPABASE_ANON_KEY,
+        {
+          auth: {
+            persistSession: true,
+            autoRefreshToken: true,
+            storage: window.localStorage
+          }
+        }
+      );
+    }
+
+    function reinitSupabase(){
+      initSupabase();
+      const st = document.getElementById("cfg-status");
+      if (!supabaseClient){
+        if (st) st.textContent = "⚠️ Nincs Supabase config (URL/KEY). Írd be és mentsd el.";
+      } else {
+        if (st) st.textContent = "✅ Supabase újrainicializálva.";
+      }
+    }
+
+    // ====== app nav ======
     function goto(hash){ location.hash = hash; }
 
     function hardReload(){
@@ -361,6 +408,10 @@ insert into public.races (id, round, name, location, start_date, end_date) value
       for (const v of views){
         const el = document.getElementById("view-" + v);
         if (el) el.classList.toggle("hidden", v !== name);
+      }
+      if (name === "login"){
+        fillConfigUI();
+        reinitSupabase();
       }
     }
 
@@ -383,9 +434,7 @@ insert into public.races (id, round, name, location, start_date, end_date) value
     async function route(){
       const base = getHashBase();
       showView(base);
-
       await refreshHomeAuthLine();
-
       if (base === "races") await loadRaces(false);
       if (base === "pick") await openPickFromHash();
       if (base === "rank") await loadRank(false);
@@ -393,23 +442,19 @@ insert into public.races (id, round, name, location, start_date, end_date) value
 
     window.addEventListener("hashchange", route);
 
-    supabaseClient.auth.onAuthStateChange(async (event, session) => {
-      const out = document.getElementById("login-output");
-      if (event === "SIGNED_IN" && session?.user){
-        const name = session.user.user_metadata?.user_name || session.user.email || session.user.id;
-        if (out) out.textContent = "✅ Bejelentkezve: " + name;
-      }
-      if (event === "SIGNED_OUT"){
-        if (out) out.textContent = "ℹ️ Kijelentkezve";
-      }
-      await refreshHomeAuthLine();
-    });
-
+    // ====== Auth UI ======
     async function refreshHomeAuthLine(){
       const el = document.getElementById("home-auth-line");
       if (!el) return;
+
+      if (!supabaseClient){
+        el.innerHTML = "⚠️ Státusz: <span class='muted'>nincs Supabase beállítva</span> (Belépés menü → add meg URL/KEY)";
+        return;
+      }
+
       const { data } = await supabaseClient.auth.getSession();
       const session = data?.session;
+
       if (session?.user){
         const name = session.user.user_metadata?.user_name || session.user.email || session.user.id;
         el.innerHTML = "🔓 Státusz: <b>bejelentkezve</b> – " + name;
@@ -420,8 +465,13 @@ insert into public.races (id, round, name, location, start_date, end_date) value
 
     async function loginWithGithub(){
       const out = document.getElementById("login-output");
+      if (!supabaseClient){
+        if (out) out.textContent = "⚠️ Előbb állítsd be a Supabase URL/KEY-t (fent).";
+        return;
+      }
       if (out) out.textContent = "⏳ GitHub belépés indítása...";
 
+      // GitHub Pages alatti path fix (nem kell kézzel írogatni)
       const redirectTo = window.location.origin + window.location.pathname;
 
       const { error } = await supabaseClient.auth.signInWithOAuth({
@@ -434,41 +484,66 @@ insert into public.races (id, round, name, location, start_date, end_date) value
 
     async function logout(){
       const out = document.getElementById("login-output");
+      if (!supabaseClient){
+        if (out) out.textContent = "⚠️ Nincs Supabase inicializálva.";
+        return;
+      }
       if (out) out.textContent = "⏳ Kijelentkezés...";
       const { error } = await supabaseClient.auth.signOut();
       if (error && out) out.textContent = "❌ Kijelentkezés hiba: " + error.message;
       if (!error && out) out.textContent = "ℹ️ Kijelentkezve";
+      await refreshHomeAuthLine();
     }
 
+    // ====== HARD Supabase test (timeout + konkret hiba) ======
     async function testSupabase(){
       const out = document.getElementById("login-output");
-      if (out) out.textContent = "⏳ Supabase teszt..." ;
+      if (out) out.textContent = "⏳ Supabase teszt...";
+
+      if (!supabaseClient){
+        if (out) out.textContent = "⚠️ Nincs Supabase inicializálva. (Belépés → írd be URL/KEY → Mentés → Újrainicializálás)";
+        return;
+      }
+
+      const withTimeout = (p, ms=8000) =>
+        Promise.race([
+          p,
+          new Promise((_, rej) => setTimeout(() => rej(new Error("Timeout 8s – nincs válasz (blokkolás / hálózat / CORS)")), ms))
+        ]);
 
       try{
-        const races = await supabaseClient.from("races").select("*", { count:"exact", head:false }).limit(3).order("round",{ascending:true});
-        if (races.error) throw races.error;
+        const races = await withTimeout(
+          supabaseClient.from("races").select("id", { count:"exact", head:false }).limit(1),
+          8000
+        );
+        if (races.error) throw new Error("races: " + races.error.message);
 
-        const drivers = await supabaseClient.from("drivers").select("*", { count:"exact", head:false }).limit(3).order("name",{ascending:true});
-        if (drivers.error) throw drivers.error;
+        const drivers = await withTimeout(
+          supabaseClient.from("drivers").select("id", { count:"exact", head:false }).limit(1),
+          8000
+        );
+        if (drivers.error) throw new Error("drivers: " + drivers.error.message);
 
-        out.textContent =
-          "✅ Supabase OK.\n" +
-          "races: " + (races.count ?? races.data?.length ?? 0) + " rekord (mutat 3-at)\n" +
-          "drivers: " + (drivers.count ?? drivers.data?.length ?? 0) + " rekord (mutat 3-at)";
+        if (out) out.textContent = "✅ Supabase OK (races + drivers elérhető).";
       }catch(e){
-        out.textContent = "❌ Supabase teszt hiba: " + (e?.message || String(e));
+        if (out) out.textContent = "❌ Supabase teszt hiba: " + (e?.message || String(e));
       }
     }
 
-    async function loadRaces(force){
+    // ====== Races list ======
+    async function loadRaces(){
       const status = document.getElementById("races-status");
       const list = document.getElementById("races-list");
-      const emptyHelp = document.getElementById("races-empty-help");
       if (!status || !list) return;
+
+      if (!supabaseClient){
+        status.textContent = "⚠️ Nincs Supabase beállítva. Menj Belépés → add meg URL/KEY.";
+        list.innerHTML = "";
+        return;
+      }
 
       status.textContent = "⏳ Futamok betöltése...";
       list.innerHTML = "";
-      if (emptyHelp) emptyHelp.style.display = "none";
 
       try{
         const res = await supabaseClient
@@ -482,7 +557,6 @@ insert into public.races (id, round, name, location, start_date, end_date) value
         const rows = res.data || [];
         if (rows.length === 0){
           status.textContent = "⚠️ Nincs futam a races táblában.";
-          if (emptyHelp) emptyHelp.style.display = "block";
           return;
         }
 
@@ -518,9 +592,8 @@ insert into public.races (id, round, name, location, start_date, end_date) value
       }
     }
 
-    // --------- pick state ----------
+    // ====== Pick page ======
     let currentRaceId = null;
-    let currentRace = null;
     let driversCache = [];
     let slots = [null,null,null,null,null];
 
@@ -579,21 +652,21 @@ insert into public.races (id, round, name, location, start_date, end_date) value
       const q = getQueryFromHash();
       const race = q.get("race");
       currentRaceId = race;
+
       const title = document.getElementById("pick-race-title");
       const status = document.getElementById("pick-status");
       const driversEl = document.getElementById("drivers-list");
-      if (driversEl) driversEl.textContent = "Betöltés...";
+
+      if (!supabaseClient){
+        if (title) title.textContent = "⚠️ Nincs Supabase beállítva. Menj Belépés → add meg URL/KEY.";
+        if (driversEl) driversEl.textContent = "";
+        return;
+      }
 
       if (!race){
         if (title) title.textContent = "⚠️ Nincs kiválasztott futam (race id hiányzik).";
         return;
       }
-
-      const { data: sess } = await supabaseClient.auth.getSession();
-      const user = sess?.session?.user || null;
-      const isAdmin = !!(user?.email && ADMIN_EMAILS.includes(user.email));
-      const adminBox = document.getElementById("admin-box");
-      if (adminBox) adminBox.classList.toggle("hidden", !isAdmin);
 
       try{
         const rr = await supabaseClient.from("races")
@@ -602,25 +675,26 @@ insert into public.races (id, round, name, location, start_date, end_date) value
           .single();
 
         if (rr.error) throw rr.error;
-        currentRace = rr.data;
 
-        const sd = currentRace.start_date ? String(currentRace.start_date) : "";
-        const ed = currentRace.end_date ? String(currentRace.end_date) : "";
+        const r = rr.data;
+        const sd = r.start_date ? String(r.start_date) : "";
+        const ed = r.end_date ? String(r.end_date) : "";
         if (title){
-          title.textContent = `Futam: #${currentRace.round} • ${currentRace.name} • ${currentRace.location || ""} ${sd ? " • " + sd + (ed ? " → " + ed : "") : ""}`;
+          title.textContent = `Futam: #${r.round} • ${r.name} • ${r.location || ""} ${sd ? " • " + sd + (ed ? " → " + ed : "") : ""}`;
         }
       }catch(e){
         if (title) title.textContent = "❌ Futam betöltési hiba: " + (e?.message || String(e));
       }
 
       await loadDrivers();
-
       slots = [null,null,null,null,null];
       buildSlotsUI();
 
+      const { data } = await supabaseClient.auth.getSession();
+      const user = data?.session?.user || null;
       if (user){
         await loadMyPick();
-      }else{
+      } else {
         if (status) status.textContent = "ℹ️ Tipp mentéshez jelentkezz be (Belépés menü).";
       }
     }
@@ -635,7 +709,7 @@ insert into public.races (id, round, name, location, start_date, end_date) value
           .from("drivers")
           .select("id, name, team, avatar_url")
           .order("name", { ascending:true })
-          .limit(300);
+          .limit(400);
 
         if (res.error) throw res.error;
 
@@ -665,6 +739,7 @@ insert into public.races (id, round, name, location, start_date, end_date) value
             img.alt = d.name;
             av.appendChild(img);
           }
+
           const info = document.createElement("div");
           const nm = document.createElement("div");
           nm.className = "d-name";
@@ -710,13 +785,7 @@ insert into public.races (id, round, name, location, start_date, end_date) value
         if (res.error) throw res.error;
 
         if (res.data){
-          slots = [
-            res.data.p1 || null,
-            res.data.p2 || null,
-            res.data.p3 || null,
-            res.data.p4 || null,
-            res.data.p5 || null
-          ];
+          slots = [res.data.p1,res.data.p2,res.data.p3,res.data.p4,res.data.p5].map(x=>x||null);
           buildSlotsUI();
           if (status) status.textContent = "✅ Korábbi tipped betöltve.";
         }else{
@@ -764,14 +833,12 @@ insert into public.races (id, round, name, location, start_date, end_date) value
 
         if (status) status.textContent = "✅ Tipp elmentve!";
       }catch(e){
-        const msg = (e?.message || String(e));
         if (status) status.textContent =
-          "❌ Mentési hiba: " + msg +
-          "\n\nHa azt írja, hogy nincs onConflict / unique constraint, akkor kell a DB-be: UNIQUE(user_id, race_id) a picks táblára.";
+          "❌ Mentési hiba: " + (e?.message || String(e)) +
+          "\n\nHa azt írja, hogy nincs unique/onConflict: a DB-be kell UNIQUE(user_id, race_id) a picks táblára.";
       }
     }
 
-    // ✅ ÚJ: DB-s törlés (nem csak UI törlés)
     async function deletePick(){
       const status = document.getElementById("pick-status");
       const { data } = await supabaseClient.auth.getSession();
@@ -805,53 +872,10 @@ insert into public.races (id, round, name, location, start_date, end_date) value
       if (status) status.textContent = "✅ Tipp törölve a DB-ből is.";
     }
 
-    async function saveResult(){
-      const adminStatus = document.getElementById("admin-status");
-      const { data } = await supabaseClient.auth.getSession();
-      const user = data?.session?.user;
-
-      const isAdmin = !!(user?.email && ADMIN_EMAILS.includes(user.email));
-      if (!isAdmin){
-        if (adminStatus) adminStatus.textContent = "❌ Nem vagy admin.";
-        return;
-      }
-      if (!currentRaceId){
-        if (adminStatus) adminStatus.textContent = "⚠️ Nincs futam kiválasztva.";
-        return;
-      }
-      if (slots.some(x => !x)){
-        if (adminStatus) adminStatus.textContent = "⚠️ Admin eredményhez is töltsd ki mind az 5 helyet.";
-        return;
-      }
-
-      if (adminStatus) adminStatus.textContent = "⏳ Eredmény mentése...";
-
-      try{
-        const payload = {
-          race_id: currentRaceId,
-          r1: slots[0], r2: slots[1], r3: slots[2], r4: slots[3], r5: slots[4],
-          updated_at: new Date().toISOString()
-        };
-
-        const res = await supabaseClient
-          .from("results")
-          .upsert(payload, { onConflict: "race_id" });
-
-        if (res.error) throw res.error;
-
-        if (adminStatus) adminStatus.textContent = "✅ Eredmény elmentve!";
-      }catch(e){
-        const msg = (e?.message || String(e));
-        if (adminStatus) adminStatus.textContent =
-          "❌ Admin mentési hiba: " + msg +
-          "\n\nEllenőrizd, hogy van results tábla és UNIQUE(race_id).";
-      }
-    }
-
+    // ====== Rank ======
     function calcPoints(picksRow, resultRow){
       const p = [picksRow.p1, picksRow.p2, picksRow.p3, picksRow.p4, picksRow.p5];
       const r = [resultRow.r1, resultRow.r2, resultRow.r3, resultRow.r4, resultRow.r5];
-
       let pts = 0;
       for (let i=0;i<5;i++){
         if (p[i] === r[i]) pts += 3;
@@ -860,10 +884,15 @@ insert into public.races (id, round, name, location, start_date, end_date) value
       return pts;
     }
 
-    async function loadRank(force){
+    async function loadRank(){
       const out = document.getElementById("rank-output");
       const st = document.getElementById("rank-status");
       if (out) out.textContent = "⏳ Betöltés...";
+
+      if (!supabaseClient){
+        if (out) out.textContent = "⚠️ Nincs Supabase beállítva. Menj Belépés → add meg URL/KEY.";
+        return;
+      }
 
       try{
         const resR = await supabaseClient.from("results").select("race_id,r1,r2,r3,r4,r5");
@@ -913,12 +942,9 @@ insert into public.races (id, round, name, location, start_date, end_date) value
       }
     }
 
+    // ====== boot ======
     (async () => {
-      if (window.location.search.includes("auth_callback=1")){
-        const u = new URL(window.location.href);
-        u.searchParams.delete("auth_callback");
-        window.history.replaceState({}, "", u.pathname + u.search + u.hash);
-      }
+      initSupabase();
       await route();
     })();
   </script>
