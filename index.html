@@ -417,10 +417,11 @@
       return driversCache;
     }
 
+    // ✅ ITT A JAVÍTÁS: city helyett location
     async function loadRaces(){
       const { data, error } = await sb
         .from("races")
-        .select("id, round, name, city, start_date, end_date")
+        .select("id, round, name, location, start_date, end_date")
         .order("round", { ascending: true });
       if(error) throw error;
       racesCache = data || [];
@@ -443,7 +444,7 @@
         el.innerHTML = `
           <div>
             <b>Futam #${r.round || "?"} • ${r.name || "Név nélkül"}</b>
-            <div class="muted" style="font-size:12px;margin-top:2px">${r.city || ""} • ${formatRange(r)}</div>
+            <div class="muted" style="font-size:12px;margin-top:2px">${r.location || ""} • ${formatRange(r)}</div>
           </div>
           <button class="btn small">Tipp ➜</button>
         `;
@@ -644,7 +645,7 @@
           const r2 = racesCache.find(r=>String(r.id)===String(raceId));
           $("pick-title").textContent = `🏁 Tipp oldal (drag & drop)`;
           $("pick-sub").textContent = r2
-            ? `Futam: #${r2.round || "?"} • ${r2.name || ""} • ${r2.city || ""} • ${formatRange(r2)}`
+            ? `Futam: #${r2.round || "?"} • ${r2.name || ""} • ${r2.location || ""} • ${formatRange(r2)}`
             : `Race ID: ${raceId}`;
 
           clearPick();
