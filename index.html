@@ -917,7 +917,7 @@ insert into public.races (id, round, name, location, start_date, end_date) value
       if (window.location.search.includes("auth_callback=1")){
         const u = new URL(window.location.href);
         u.searchParams.delete("auth_callback");
-        window.history.replaceState({}, "", u.pathname + u.hash);
+        window.history.replaceState({}, "", u.pathname + u.search + u.hash);
       }
       await route();
     })();
