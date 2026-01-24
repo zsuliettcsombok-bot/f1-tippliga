@@ -345,6 +345,9 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 
   <script>
+    // ==============================================================
+    // ✅ SUPABASE KONFIG
+    // ==============================================================
     const SUPABASE_URL = "https://mtobtiwoiqqxdkduvjmf.supabase.co";
     const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im10b2J0aXdvaXFxeGRrZHV2am1mIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjgxMTY2NzAsImV4cCI6MjA4MzY5MjY3MH0.qB5tb9uj2GN4iKRvyZnv_lVRZ9xnlgtY3rN6oZV_LDc";
 
@@ -353,6 +356,7 @@
       auth: { persistSession: true, autoRefreshToken: true, storage: window.localStorage }
     }));
 
+    // ---------------- UI helpers ----------------
     const $ = (id)=>document.getElementById(id);
     const setActiveNav = (route)=>{
       document.querySelectorAll("#nav a").forEach(a=>{
@@ -367,12 +371,14 @@
     };
     const goto = (hash)=>{ location.hash = hash; };
 
+    // ---------------- App state ----------------
     let currentUser = null;
     let racesCache = [];
     let driversCache = [];
     let currentRaceId = null;
     let pickSlots = [null,null,null,null,null];
 
+    // ---------------- Status UI ----------------
     function setStatus(kind, text){
       const dot = $("status-dot");
       dot.classList.remove("ok","warn","bad");
@@ -386,6 +392,7 @@
       $("login-status").textContent = text;
     }
 
+    // ---------------- Auth ----------------
     async function refreshAuth(){
       const { data, error } = await sb.auth.getUser();
       if(error){
@@ -407,6 +414,7 @@
 
     sb.auth.onAuthStateChange(()=>{ refreshAuth(); });
 
+    // ---------------- Data loading ----------------
     async function loadDrivers(){
       const { data, error } = await sb
         .from("drivers")
@@ -417,7 +425,7 @@
       return driversCache;
     }
 
-    // ✅ ITT A JAVÍTÁS: city helyett location
+    // ✅ races: city helyett location
     async function loadRaces(){
       const { data, error } = await sb
         .from("races")
@@ -435,6 +443,7 @@
       return e ? `${s} → ${e}` : s;
     }
 
+    // ---------------- Races page ----------------
     function renderRaces(){
       const list = $("races-list");
       list.innerHTML = "";
@@ -459,6 +468,7 @@
         : "Nincs futam a táblában.";
     }
 
+    // ---------------- Pick page (drag&drop) ----------------
     function renderSlots(){
       const wrap = $("slots");
       wrap.innerHTML = "";
@@ -523,31 +533,35 @@
       renderSlots();
     }
 
+    // ✅ picks: positions helyett p1..p5
     async function loadExistingPick(raceId){
       $("pick-loaded").classList.add("hide");
       if(!currentUser) return;
 
       const { data, error } = await sb
         .from("picks")
-        .select("positions")
+        .select("p1,p2,p3,p4,p5")
         .eq("user_id", currentUser.id)
         .eq("race_id", raceId)
         .maybeSingle();
 
       if(error) throw error;
 
-      if(data?.positions){
-        const ids = Array.isArray(data.positions) ? data.positions : [];
-        const resolved = ids.map(v=>{
-          const id = (typeof v === "object" && v) ? v.id : v;
+      if(data){
+        const ids = [data.p1, data.p2, data.p3, data.p4, data.p5];
+        const resolved = ids.map(id=>{
+          if(!id) return null;
           return driversCache.find(d=>String(d.id)===String(id)) || null;
         });
-        pickSlots = [resolved[0]||null,resolved[1]||null,resolved[2]||null,resolved[3]||null,resolved[4]||null];
+        pickSlots = [resolved[0],resolved[1],resolved[2],resolved[3],resolved[4]];
         renderSlots();
-        $("pick-loaded").classList.remove("hide");
+
+        const any = pickSlots.some(x=>x!==null);
+        if(any) $("pick-loaded").classList.remove("hide");
       }
     }
 
+    // ✅ Mentés: a tábládban p1..p5 NOT NULL, ezért mind az 5-nek meg kell lennie
     async function savePick(){
       if(!currentUser){
         $("pick-status").textContent = "Mentéshez belépés kell.";
@@ -559,16 +573,26 @@
         return;
       }
 
-      const positions = pickSlots.map(d=> d ? d.id : null);
-      if(!positions.some(x=>x!==null)){
-        $("pick-status").textContent = "Nincs mit menteni (üres tipp).";
+      const allFilled = pickSlots.every(d => d && d.id);
+      if(!allFilled){
+        $("pick-status").textContent = "A mentéshez töltsd ki mind az 5 helyet (1–5).";
         return;
       }
 
       $("pick-status").textContent = "Mentés...";
+      const payload = {
+        user_id: currentUser.id,
+        race_id: currentRaceId,
+        p1: String(pickSlots[0].id),
+        p2: String(pickSlots[1].id),
+        p3: String(pickSlots[2].id),
+        p4: String(pickSlots[3].id),
+        p5: String(pickSlots[4].id)
+      };
+
       const { error } = await sb
         .from("picks")
-        .upsert({ user_id: currentUser.id, race_id: currentRaceId, positions }, { onConflict: "user_id,race_id" });
+        .upsert(payload, { onConflict: "user_id,race_id" });
 
       if(error){
         console.error(error);
@@ -596,6 +620,7 @@
       $("pick-status").textContent = "Tipp törölve ✅";
     }
 
+    // ---------------- Router ----------------
     function parseHash(){
       const h = (location.hash || "#home").slice(1);
       const [route, query] = h.split("?");
@@ -663,6 +688,7 @@
       showPage("home");
     }
 
+    // ---------------- Buttons wiring ----------------
     $("go-races").addEventListener("click", ()=>goto("#races"));
     $("go-login").addEventListener("click", ()=>goto("#login"));
     $("btn-refresh").addEventListener("click", async ()=>{
@@ -714,6 +740,7 @@
       goto("#home");
     });
 
+    // ---------------- Init ----------------
     window.addEventListener("hashchange", onRoute);
 
     (async function init(){
