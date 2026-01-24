@@ -4,345 +4,378 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>F1 2026 Tipp Liga</title>
-  <link rel="icon" href="data:,">
   <style>
     :root{
-      --red:#c40000;
-      --red2:#ff2a2a;
-      --bg:#050505;
-      --panel:#101010;
-      --text:#f2f2f2;
-      --muted:#bdbdbd;
-      --line:#2a2a2a;
-      --glow: rgba(255, 0, 0, .22);
+      --bg1:#0b0b0f;
+      --bg2:#2a0000;
+      --card:rgba(0,0,0,.45);
+      --border:rgba(255,255,255,.10);
+      --text:#f3f3f3;
+      --muted:rgba(255,255,255,.70);
+      --red:#d8232a;
+      --red2:#9b0000;
+      --btn:#b10f12;
+      --btn2:#e51f26;
+      --ok:#1fbf6b;
+      --warn:#ffb020;
     }
     *{box-sizing:border-box}
     body{
       margin:0;
-      font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Noto Sans,sans-serif;
-      background:
-        radial-gradient(1200px 600px at 25% 15%, rgba(255,0,0,.18), transparent 55%),
-        radial-gradient(900px 500px at 70% 30%, rgba(255,0,0,.12), transparent 55%),
-        linear-gradient(#000,#050505 25%, #050505);
+      font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;
       color:var(--text);
+      background:
+        radial-gradient(900px 500px at 25% 15%, rgba(216,35,42,.35), transparent 60%),
+        radial-gradient(900px 500px at 75% 85%, rgba(216,35,42,.20), transparent 60%),
+        linear-gradient(135deg, var(--bg2), var(--bg1));
+      min-height:100vh;
     }
     .topbar{
       position:sticky; top:0; z-index:10;
-      background: linear-gradient(90deg, #7f0000, var(--red));
-      border-bottom:1px solid rgba(255,255,255,.06);
-      padding:12px 18px;
+      display:flex; gap:14px; align-items:center; justify-content:space-between;
+      padding:14px 18px;
+      background:linear-gradient(180deg, rgba(0,0,0,.70), rgba(0,0,0,.35));
+      border-bottom:1px solid var(--border);
+      backdrop-filter: blur(10px);
     }
-    .topbar-inner{
-      max-width:1200px; margin:0 auto;
-      display:flex; align-items:center; gap:14px;
+    .brand{
+      display:flex; gap:10px; align-items:center;
+      font-weight:800; letter-spacing:.4px;
     }
-    .brand{display:flex; align-items:center; gap:10px; font-weight:900; letter-spacing:.4px;}
-    .brand-pill{
-      background:rgba(0,0,0,.22);
-      border:1px solid rgba(255,255,255,.12);
-      padding:6px 10px;
-      border-radius:999px;
-      font-size:14px;
+    .pill{
+      width:38px;height:38px;border-radius:999px;
+      background:linear-gradient(135deg, var(--red2), var(--red));
+      display:grid; place-items:center;
+      border:1px solid rgba(255,255,255,.14);
+      box-shadow:0 8px 22px rgba(0,0,0,.35);
+      font-weight:900;
     }
-    .nav{margin-left:auto; display:flex; gap:10px; flex-wrap:wrap;}
+    .nav{display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-end}
     .nav a{
-      text-decoration:none; color:#fff;
-      background:rgba(0,0,0,.22);
-      border:1px solid rgba(255,255,255,.12);
+      text-decoration:none;
+      color:var(--text);
       padding:10px 14px;
       border-radius:14px;
-      font-weight:800;
+      background:rgba(0,0,0,.35);
+      border:1px solid var(--border);
+      font-weight:700;
     }
-    .nav a:hover{ outline:2px solid rgba(255,255,255,.08); }
-
-    .wrap{max-width:1200px; margin:22px auto 60px; padding:0 18px;}
+    .nav a.active{background:rgba(216,35,42,.22); border-color:rgba(216,35,42,.35)}
+    .wrap{max-width:1200px; margin:24px auto; padding:0 16px}
     .card{
-      background: linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.01));
-      border:1px solid rgba(255,255,255,.08);
-      border-radius:22px;
-      box-shadow: 0 18px 60px rgba(0,0,0,.45);
-      padding:22px;
-      position:relative;
+      background:var(--card);
+      border:1px solid var(--border);
+      border-radius:18px;
+      box-shadow:0 18px 44px rgba(0,0,0,.35);
       overflow:hidden;
     }
-    .card:before{
-      content:"";
-      position:absolute; inset:-2px;
-      background: radial-gradient(500px 200px at 15% 15%, rgba(255,0,0,.18), transparent 60%);
-      pointer-events:none;
+    .card-h{
+      padding:18px 18px 14px;
+      border-bottom:1px solid var(--border);
+      background:linear-gradient(180deg, rgba(216,35,42,.16), transparent);
     }
-    .badge{
-      display:inline-flex; align-items:center; gap:8px;
-      padding:6px 10px; border-radius:999px;
-      border:1px solid rgba(255,255,255,.10);
-      background:rgba(0,0,0,.25);
-      color:var(--muted);
-      font-weight:800;
-      margin-bottom:10px;
-      position:relative; z-index:1;
-    }
-    h1{margin:0 0 8px; font-size:44px; line-height:1.05; position:relative; z-index:1;}
-    h2{margin:0 0 8px; position:relative; z-index:1;}
-    p{position:relative; z-index:1;}
-    .lead{margin:0 0 18px; color:#d7d7d7;}
-    .muted{color:var(--muted);}
-    .actions{display:flex; gap:10px; flex-wrap:wrap; position:relative; z-index:1;}
+    .card-h h2{margin:0;font-size:22px}
+    .card-b{padding:18px}
+    .row{display:flex; gap:14px; flex-wrap:wrap}
+    .col{flex:1; min-width:280px}
     .btn{
       cursor:pointer;
       border:none;
-      border-radius:14px;
-      padding:12px 16px;
-      font-weight:900;
-      color:#fff;
-      background: rgba(0,0,0,.25);
-      border:1px solid rgba(255,255,255,.12);
-      box-shadow:0 12px 28px rgba(0,0,0,.35);
-    }
-    .btn.primary{
-      background: linear-gradient(180deg, var(--red2), #b00000);
-      border:1px solid rgba(255,255,255,.14);
-      box-shadow:0 18px 40px var(--glow);
-    }
-    .btn:hover{ outline:2px solid rgba(255,255,255,.08); }
-    .hidden{display:none !important;}
-    .line{
-      margin-top:12px;
-      padding:10px 12px;
-      border-radius:12px;
-      background:rgba(0,0,0,.22);
-      border:1px solid rgba(255,255,255,.10);
-      color:#e8e8e8;
-      position:relative; z-index:1;
-      word-break: break-word;
-      white-space: pre-wrap;
-    }
-    .foot{margin-top:18px; text-align:center; color:#bdbdbd; opacity:.9; font-size:14px;}
-
-    /* ====== Verseny lista ====== */
-    .race-list{display:flex; flex-direction:column; gap:10px; position:relative; z-index:1;}
-    .race-item{
-      display:flex; align-items:center; justify-content:space-between; gap:12px;
       padding:12px 14px;
       border-radius:14px;
-      background:rgba(0,0,0,.22);
-      border:1px solid rgba(255,255,255,.10);
-      cursor:pointer;
+      color:white;
+      font-weight:800;
+      background:linear-gradient(135deg, var(--btn), var(--btn2));
+      box-shadow:0 12px 26px rgba(0,0,0,.35);
+      display:inline-flex; gap:10px; align-items:center;
     }
-    .race-item:hover{ outline:2px solid rgba(255,255,255,.08); }
-    .race-title{font-weight:900;}
-    .race-meta{color:var(--muted); font-weight:700; font-size:13px;}
+    .btn.secondary{
+      background:rgba(0,0,0,.35);
+      border:1px solid var(--border);
+      box-shadow:none;
+      color:var(--text);
+    }
+    .btn.small{padding:10px 12px; border-radius:12px; font-weight:800}
+    .muted{color:var(--muted)}
+    .status{
+      margin-top:14px;
+      padding:12px 14px;
+      border-radius:14px;
+      border:1px solid var(--border);
+      background:rgba(0,0,0,.25);
+      display:flex; gap:10px; align-items:center;
+      min-height:44px;
+    }
+    .status .dot{width:10px;height:10px;border-radius:50%}
+    .dot.ok{background:var(--ok)}
+    .dot.warn{background:var(--warn)}
+    .dot.bad{background:#ff3b3b}
+    .foot{
+      opacity:.7;
+      text-align:center;
+      padding:18px 10px 30px;
+      font-size:13px;
+    }
 
-    /* ====== Pick page layout ====== */
-    .grid{display:grid; grid-template-columns: 1.1fr .9fr; gap:14px; position:relative; z-index:1;}
-    @media(max-width: 980px){ .grid{grid-template-columns:1fr;} }
+    /* races list */
+    .list{
+      display:grid;
+      gap:10px;
+    }
+    .item{
+      padding:12px 14px;
+      border-radius:14px;
+      border:1px solid var(--border);
+      background:rgba(0,0,0,.25);
+      display:flex;
+      justify-content:space-between;
+      gap:10px;
+      align-items:center;
+    }
+    .item b{font-size:15px}
+    .tag{
+      font-size:12px;
+      padding:6px 10px;
+      border-radius:999px;
+      background:rgba(216,35,42,.22);
+      border:1px solid rgba(216,35,42,.35);
+      color:var(--text);
+      white-space:nowrap;
+    }
 
-    .panel{
+    /* pick UI */
+    .pickGrid{display:grid; grid-template-columns: 1fr 1fr; gap:14px}
+    @media(max-width:900px){ .pickGrid{grid-template-columns:1fr} }
+    .slot{
+      border:1px dashed rgba(255,255,255,.25);
       background:rgba(0,0,0,.22);
-      border:1px solid rgba(255,255,255,.10);
       border-radius:16px;
       padding:12px;
+      min-height:62px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
     }
+    .slot .num{
+      width:40px;height:40px;border-radius:14px;
+      display:grid;place-items:center;
+      font-weight:900;
+      background:rgba(216,35,42,.18);
+      border:1px solid rgba(216,35,42,.28);
+    }
+    .slot .name{font-weight:850}
+    .slot .empty{opacity:.55}
+    .driverList{
+      max-height:420px;
+      overflow:auto;
+      border:1px solid var(--border);
+      border-radius:16px;
+      background:rgba(0,0,0,.18);
+    }
+    .driver{
+      padding:12px 12px;
+      border-bottom:1px solid rgba(255,255,255,.08);
+      display:flex; align-items:center; justify-content:space-between;
+      gap:10px;
+    }
+    .driver:last-child{border-bottom:none}
+    .driver .left{display:flex; flex-direction:column; line-height:1.15}
+    .driver .left b{font-size:14px}
+    .driver .left span{font-size:12px; opacity:.7}
+    .dragHint{opacity:.7; font-weight:800; font-size:12px}
 
-    .slots{display:flex; flex-direction:column; gap:10px; margin-top:10px;}
-    .slot{
-      display:flex; align-items:center; justify-content:space-between; gap:10px;
+    .okline{
+      margin-top:12px;
+      padding:10px 12px;
+      border-radius:14px;
+      border:1px solid rgba(31,191,107,.35);
+      background:rgba(31,191,107,.12);
+      display:flex; gap:10px; align-items:center;
+      font-weight:800;
+    }
+    .hide{display:none!important}
+    input{
+      width:100%;
       padding:12px 12px;
       border-radius:14px;
-      background:rgba(0,0,0,.18);
-      border:1px dashed rgba(255,255,255,.18);
-      min-height:52px;
+      border:1px solid var(--border);
+      background:rgba(0,0,0,.25);
+      color:var(--text);
+      outline:none;
+      font-size:14px;
     }
-    .slot strong{font-size:14px;}
-    .slot .hint{color:var(--muted); font-weight:800;}
-    .slot.filled{border-style:solid; border-color: rgba(255,255,255,.14);}
-
-    .driver-list{display:flex; flex-direction:column; gap:10px; margin-top:10px; max-height:520px; overflow:auto; padding-right:4px;}
-    .driver{
-      display:flex; align-items:center; justify-content:space-between; gap:10px;
-      padding:10px 10px;
-      border-radius:14px;
-      background:rgba(0,0,0,.22);
-      border:1px solid rgba(255,255,255,.10);
-      cursor:grab;
-    }
-    .driver:active{cursor:grabbing;}
-    .d-left{display:flex; align-items:center; gap:10px;}
-    .avatar{
-      width:36px; height:36px; border-radius:999px;
-      background:rgba(255,255,255,.10);
-      border:1px solid rgba(255,255,255,.12);
-      overflow:hidden;
-      flex:0 0 auto;
-    }
-    .avatar img{width:100%; height:100%; object-fit:cover; display:block;}
-    .d-name{font-weight:900;}
-    .d-team{color:var(--muted); font-weight:800; font-size:12px;}
-
-    .admin-box{margin-top:14px;}
-    .admin-title{font-weight:900; margin-bottom:6px;}
+    label{font-size:12px; opacity:.8; font-weight:800}
   </style>
 </head>
-
 <body>
-  <header class="topbar">
-    <div class="topbar-inner">
-      <div class="brand">
-        <span class="brand-pill">F1</span>
-        <span>2026 TIPP LIGA</span>
-      </div>
 
-      <nav class="nav">
-        <a href="#home">Kezdő</a>
-        <a href="#races">Versenynaptár</a>
-        <a href="#rank">Ranglista</a>
-        <a href="#login">Belépés</a>
-      </nav>
+  <div class="topbar">
+    <div class="brand">
+      <div class="pill">F1</div>
+      <div>2026 TIPP LIGA</div>
     </div>
-  </header>
+    <div class="nav" id="nav">
+      <a href="#home" data-route="home">Kezdő</a>
+      <a href="#races" data-route="races">Versenynaptár</a>
+      <a href="#standings" data-route="standings">Ranglista</a>
+      <a href="#login" data-route="login">Belépés</a>
+    </div>
+  </div>
 
-  <main class="wrap">
-
+  <div class="wrap">
     <!-- HOME -->
-    <section id="view-home">
-      <div class="card">
-        <div class="badge">🏁 MVP • Futamlista → Tipp oldal (drag & drop) + Ranglista névvel</div>
-        <h1>F1 2026 Tipp Liga</h1>
-        <p class="lead">Főoldalon futamnaptár. Futamot kiválasztva külön Tipp oldalon húzod be az 1–5. helyre a pilótákat. Mentés Supabase-be. Ranglista GitHub névvel.</p>
-        <div class="actions">
-          <button class="btn primary" onclick="goto('#races')">📅 Versenynaptár</button>
-          <button class="btn" onclick="goto('#login')">🚀 Belépés</button>
-          <button class="btn" onclick="hardReload()">🔁 Frissítés</button>
+    <section class="card" id="page-home">
+      <div class="card-h">
+        <div class="tag">MVP • Futamlista → Tipp oldal (drag & drop) + Ranglista</div>
+        <h2 style="margin-top:12px;font-size:44px;letter-spacing:.3px">F1 2026 Tipp Liga</h2>
+        <div class="muted" style="max-width:760px">
+          Főoldalon futamnaptár. Futamot kiválasztva külön Tipp oldalon húzod be az 1–5. helyre a pilótákat.
+          Mentés Supabase-be.
+        </div>
+      </div>
+      <div class="card-b">
+        <div class="row">
+          <button class="btn" id="go-races">🗓️ Versenynaptár</button>
+          <button class="btn secondary" id="go-login">🔐 Belépés</button>
+          <button class="btn secondary" id="btn-refresh">🔄 Frissítés</button>
         </div>
 
-        <div class="line" id="home-auth-line">🔒 Státusz: <span class="muted">ellenőrzés...</span></div>
+        <div class="status" id="status">
+          <span class="dot warn" id="status-dot"></span>
+          <span id="status-text">Státusz: ellenőrzés...</span>
+        </div>
       </div>
-      <div class="foot">© F1 Tipp Liga 2026 • GitHub Pages • Supabase</div>
     </section>
 
     <!-- RACES -->
-    <section id="view-races" class="hidden">
-      <div class="card">
-        <h2>📅 Versenynaptár</h2>
-        <p class="muted">Kattints egy futamra → átvisz a Tipp oldalra.</p>
-
-        <div class="actions" style="margin-top:12px;">
-          <button class="btn" onclick="goto('#home')">⬅️ Vissza</button>
-          <button class="btn primary" onclick="loadRaces(true)">🔄 Lista frissítése</button>
-        </div>
-
-        <div class="line" id="races-status">Betöltés...</div>
-        <div class="race-list" id="races-list" style="margin-top:12px;"></div>
-
-        <div class="line" id="races-empty-help" style="display:none; margin-top:14px;">
-⚠️ Nincs futam adat a <b>races</b> táblában.
-
-Mit tegyél:
-1) Supabase → SQL Editor
-2) Illeszd be az alábbi MINTA INSERT-et (csak demo), majd Run.
-3) Utána itt nyomj: “Lista frissítése”.
-
-MINTA (demo) SQL:
-insert into public.races (id, round, name, location, start_date, end_date) values
-(gen_random_uuid(), 1, 'Demo GP 1', 'Demo City', '2026-03-01', '2026-03-03'),
-(gen_random_uuid(), 2, 'Demo GP 2', 'Demo City', '2026-03-15', '2026-03-17');
-        </div>
+    <section class="card hide" id="page-races" style="margin-top:16px">
+      <div class="card-h">
+        <h2>🗓️ Versenynaptár</h2>
+        <div class="muted">Kattints egy futamra → átvisz a Tipp oldalra.</div>
       </div>
-      <div class="foot">© F1 Tipp Liga 2026 • GitHub Pages • Supabase</div>
+      <div class="card-b">
+        <div class="row">
+          <button class="btn secondary small" id="races-back">⬅️ Vissza</button>
+          <button class="btn small" id="races-refresh">🔄 Lista frissítése</button>
+        </div>
+        <div class="status" style="margin-top:14px">
+          <span class="dot warn"></span>
+          <span id="races-status">Futamok betöltése...</span>
+        </div>
+        <div class="list" id="races-list" style="margin-top:14px"></div>
+      </div>
     </section>
 
     <!-- PICK -->
-    <section id="view-pick" class="hidden">
-      <div class="card">
-        <h2>🧲 Tipp oldal (drag & drop)</h2>
-        <div class="muted" id="pick-race-title">Futam: betöltés...</div>
-
-        <div class="actions" style="margin-top:12px;">
-          <button class="btn" onclick="goto('#races')">⬅️ Vissza a futamokhoz</button>
-          <button class="btn" onclick="clearSlots()">🧹 Törlés</button>
-          <button class="btn" onclick="deletePick()">🗑 Tipp törlése</button>
-          <button class="btn primary" onclick="savePick()">💾 Tipp mentése</button>
+    <section class="card hide" id="page-pick" style="margin-top:16px">
+      <div class="card-h">
+        <h2 id="pick-title">🏁 Tipp oldal</h2>
+        <div class="muted" id="pick-sub">Futam adatok betöltése...</div>
+      </div>
+      <div class="card-b">
+        <div class="row">
+          <button class="btn secondary small" id="pick-back">⬅️ Vissza a futamokhoz</button>
+          <button class="btn secondary small" id="pick-clear">🧹 Törlés</button>
+          <button class="btn secondary small" id="pick-remove">🗑️ Tipp törlése</button>
+          <button class="btn small" id="pick-save">💾 Tipp mentése</button>
         </div>
 
-        <div class="grid" style="margin-top:14px;">
-          <div class="panel">
-            <div style="font-weight:900;">Helyezések (1–5)</div>
-            <div class="slots" id="slots"></div>
-
-            <div class="admin-box hidden" id="admin-box">
-              <div class="admin-title">🔧 Admin – Eredmény (Top5) rögzítése</div>
-              <div class="muted">Ugyanaz a drag&drop: húzd be az 1–5 helyre, majd mentés.</div>
-              <div class="actions" style="margin-top:10px;">
-                <button class="btn primary" onclick="saveResult()">✅ Eredmény mentése (admin)</button>
-              </div>
-              <div class="line" id="admin-status">Admin kész.</div>
+        <div class="pickGrid" style="margin-top:14px">
+          <div class="col">
+            <div class="tag" style="display:inline-block;margin-bottom:10px">Helyezések (1–5)</div>
+            <div id="slots"></div>
+            <div class="okline hide" id="pick-loaded">
+              ✅ Korábbi tipped betöltve.
             </div>
-
-            <div class="line" id="pick-status">Készen áll.</div>
           </div>
-
-          <div class="panel">
-            <div style="font-weight:900;">Pilóták</div>
-            <div class="muted">Húzd a pilótát egy helyre.</div>
-            <div class="driver-list" id="drivers-list">Betöltés...</div>
+          <div class="col">
+            <div class="tag" style="display:inline-block;margin-bottom:10px">Pilóták</div>
+            <div class="muted" style="margin-bottom:10px">Húzd a pilótát egy helyre.</div>
+            <div class="driverList" id="drivers"></div>
           </div>
         </div>
-      </div>
-      <div class="foot">© F1 Tipp Liga 2026 • GitHub Pages • Supabase</div>
-    </section>
 
-    <!-- RANK -->
-    <section id="view-rank" class="hidden">
-      <div class="card">
-        <h2>📊 Ranglista</h2>
-        <p class="muted">Pontozás: 3 pont a pontos találatért, 1 pont ha benne van a Top5-ben másik helyen. Név: GitHub username a profiles táblából.</p>
-        <div class="actions" style="margin-top:12px;">
-          <button class="btn" onclick="goto('#home')">⬅️ Vissza</button>
-          <button class="btn primary" onclick="loadRank(true)">🔄 Ranglista frissítése</button>
+        <div class="status" style="margin-top:14px">
+          <span class="dot warn"></span>
+          <span id="pick-status">Betöltés...</span>
         </div>
-        <div class="line" id="rank-status">Készen áll.</div>
-        <div class="line" id="rank-output">Betöltés...</div>
       </div>
-      <div class="foot">© F1 Tipp Liga 2026 • GitHub Pages • Supabase</div>
     </section>
 
     <!-- LOGIN -->
-    <section id="view-login" class="hidden">
-      <div class="card">
-        <h2>🚀 Belépés</h2>
-        <p class="muted">Előbb DB teszt, utána GitHub belépés. (Session mentődik localStorage-be.)</p>
-
-        <div class="actions">
-          <button class="btn primary" onclick="testSupabase()">✅ Supabase kapcsolat teszt</button>
-          <button class="btn" onclick="loginWithGithub()">🐙 GitHub belépés</button>
-          <button class="btn" onclick="logout()">🚪 Kijelentkezés</button>
-          <button class="btn" onclick="goto('#home')">⬅️ Vissza</button>
+    <section class="card hide" id="page-login" style="margin-top:16px">
+      <div class="card-h">
+        <h2>🔐 Belépés</h2>
+        <div class="muted">Email + jelszó (Supabase Auth). Ha nincs fiók, regisztrál.</div>
+      </div>
+      <div class="card-b">
+        <div class="row">
+          <div class="col">
+            <label>Email</label>
+            <input id="login-email" placeholder="email@valami.com" />
+          </div>
+          <div class="col">
+            <label>Jelszó</label>
+            <input id="login-pass" type="password" placeholder="••••••••" />
+          </div>
+        </div>
+        <div class="row" style="margin-top:14px">
+          <button class="btn" id="btn-signin">Belépés</button>
+          <button class="btn secondary" id="btn-signup">Regisztráció</button>
+          <button class="btn secondary" id="btn-signout">Kijelentkezés</button>
+          <button class="btn secondary" id="login-back">Vissza</button>
         </div>
 
-        <div id="login-output" class="line muted">Készen áll.</div>
+        <div class="status">
+          <span class="dot warn" id="login-dot"></span>
+          <span id="login-status">Állapot: ellenőrzés...</span>
+        </div>
       </div>
-      <div class="foot">© F1 Tipp Liga 2026 • GitHub Pages • Supabase</div>
     </section>
-  </main>
 
-  <!-- ===================== SUPABASE + APP ===================== -->
+    <!-- STANDINGS -->
+    <section class="card hide" id="page-standings" style="margin-top:16px">
+      <div class="card-h">
+        <h2>🏆 Ranglista</h2>
+        <div class="muted">MVP-ben itt most csak a váz van (később pontszámítás).</div>
+      </div>
+      <div class="card-b">
+        <div class="status">
+          <span class="dot warn"></span>
+          <span>Hamarosan: pontszámítás + toplista (Supabase-ből).</span>
+        </div>
+      </div>
+    </section>
+
+    <div class="foot">© F1 Tipp Liga 2026 • GitHub Pages • Supabase</div>
+  </div>
+
+  <!-- ======================= SUPABASE + APP ======================= -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
-    // ============================================================
-    // ✅ 1) IDE CSAK A SAJÁT SUPABASE ADATAID KELLENEK (2 sor)
-    // ============================================================
-    const SUPABASE_URL = "https://mtobtiwoiqqxdkduvjmf.supabase.co";
-    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im10b2J0aXdvaXFxeGRrZHV2am1mIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjgxMTY2NzAsImV4cCI6MjA4MzY5MjY3MH0.qB5tb9uj2GN4iKRvyZnv_lVRZ9xnlgtY3rN6oZV_LDc";
+    // ==============================================================
+    // ✅ IDE CSAK A SAJÁT SUPABASE ADATAID KELLENEK (2 sor)
+    // ==============================================================
 
-    // ============================================================
-    // ✅ 2) Base path GitHub Pages-hez (pl. /f1-tippliga/)
-    // ============================================================
+    const SUPABASE_URL = "https://IDE_IRESD_BE_A_SUPABASE_URL_T.pl.supabase.co";
+    const SUPABASE_ANON_KEY = "IDE_IRESD_BE_A_SUPABASE_ANON_KEY_T";
+
+    // ==============================================================
+    // ✅ GitHub Pages base path (hash routingnál csak UI-hoz kell)
+    // ==============================================================
+
     const BASE_PATH = (function(){
       const p = window.location.pathname;
-      if (p.endsWith("/")) return p;            // /f1-tippliga/
-      return p.substring(0, p.lastIndexOf("/") + 1); // /f1-tippliga/ vagy /.../
+      if (p.endsWith("/")) return p;
+      return p.substring(0, p.lastIndexOf("/") + 1);
     })();
 
-    const supabaseClient = window.supabase.createClient(
+    // ==============================================================
+    // ✅ SUPABASE CLIENT (FONTOS: neve 'supabase', így supabase.from működik!)
+    // ==============================================================
+
+    const supabase = window.supabase.createClient(
       SUPABASE_URL,
       SUPABASE_ANON_KEY,
       {
@@ -354,640 +387,424 @@ insert into public.races (id, round, name, location, start_date, end_date) value
       }
     );
 
-    // ✅ ADMIN: ha kell majd eredmény mentéshez
-    const ADMIN_EMAILS = [
-      // "zoltan.csombok@hellmann.com"
-    ];
+    // ---------------- UI helpers ----------------
+    const $ = (id)=>document.getElementById(id);
+    const setActiveNav = (route)=>{
+      document.querySelectorAll("#nav a").forEach(a=>{
+        a.classList.toggle("active", a.dataset.route === route);
+      });
+    };
+    const showPage = (route)=>{
+      const pages = ["home","races","pick","login","standings"];
+      pages.forEach(p => $("page-"+p).classList.add("hide"));
+      $("page-"+route).classList.remove("hide");
+      setActiveNav(route);
+    };
+    const goto = (hash)=>{ location.hash = hash; };
 
-    function goto(hash){ location.hash = hash; }
+    // ---------------- App state ----------------
+    let currentUser = null;
+    let racesCache = [];
+    let driversCache = [];
+    let currentRaceId = null;
+    let pickSlots = [null,null,null,null,null]; // drivers objects
 
-    function hardReload(){
-      const u = new URL(window.location.href);
-      u.searchParams.set("v", String(Date.now()));
-      window.location.href = u.toString();
+    // ---------------- Status UI ----------------
+    function setStatus(kind, text){
+      const dot = $("status-dot");
+      dot.classList.remove("ok","warn","bad");
+      dot.classList.add(kind);
+      $("status-text").textContent = text;
+    }
+    function setLoginStatus(kind, text){
+      const dot = $("login-dot");
+      dot.classList.remove("ok","warn","bad");
+      dot.classList.add(kind);
+      $("login-status").textContent = text;
     }
 
-    function showView(name){
-      const views = ["home","races","pick","rank","login"];
-      for (const v of views){
-        const el = document.getElementById("view-" + v);
-        if (el) el.classList.toggle("hidden", v !== name);
+    // ---------------- Auth ----------------
+    async function refreshAuth(){
+      const { data } = await supabase.auth.getUser();
+      currentUser = data?.user ?? null;
+      if(currentUser){
+        setStatus("ok", "Bejelentkezve: " + (currentUser.email || "felhasználó"));
+        setLoginStatus("ok", "Bejelentkezve: " + (currentUser.email || "felhasználó"));
+      }else{
+        setStatus("warn", "Nincs belépve. A mentéshez belépés kell.");
+        setLoginStatus("warn", "Nincs belépve.");
       }
     }
-
-    function getHashBase(){
-      const raw = (location.hash || "#home").slice(1);
-      const qIndex = raw.indexOf("?");
-      const base = (qIndex === -1 ? raw : raw.slice(0, qIndex));
-
-      if (base.startsWith("pick")) return "pick";
-      if (base.startsWith("races")) return "races";
-      if (base.startsWith("rank")) return "rank";
-      if (base.startsWith("login")) return "login";
-      return "home";
-    }
-
-    function getQueryFromHash(){
-      const raw = (location.hash || "#home").slice(1);
-      const qIndex = raw.indexOf("?");
-      if (qIndex === -1) return new URLSearchParams();
-      return new URLSearchParams(raw.slice(qIndex+1));
-    }
-
-    async function route(){
-      const base = getHashBase();
-      showView(base);
-
-      await refreshHomeAuthLine();
-
-      if (base === "races") await loadRaces(false);
-      if (base === "pick") await openPickFromHash();
-      if (base === "rank") await loadRank(false);
-    }
-
-    window.addEventListener("hashchange", route);
-
-    // ✅ AUTH state change (itt mentjük a profiles sort is)
-    supabaseClient.auth.onAuthStateChange(async (event, session) => {
-      const out = document.getElementById("login-output");
-
-      if (event === "SIGNED_IN" && session?.user){
-        const name = session.user.user_metadata?.user_name || session.user.email || session.user.id;
-        if (out) out.textContent = "✅ Bejelentkezve: " + name;
-
-        // ✅ profiles mentés (GitHub username / avatar)
-        try {
-          const u = session.user;
-          const display =
-            u.user_metadata?.user_name ||
-            u.user_metadata?.preferred_username ||
-            u.user_metadata?.name ||
-            u.email ||
-            u.id;
-
-          const avatar =
-            u.user_metadata?.avatar_url ||
-            u.user_metadata?.picture ||
-            "";
-
-          await supabaseClient
-            .from("profiles")
-            .upsert({
-              user_id: u.id,
-              display_name: display,
-              avatar_url: avatar,
-              updated_at: new Date().toISOString()
-            }, { onConflict: "user_id" });
-        } catch (e) {
-          console.warn("profiles upsert failed:", e?.message || e);
-        }
-      }
-
-      if (event === "SIGNED_OUT"){
-        if (out) out.textContent = "ℹ️ Kijelentkezve";
-      }
-
-      await refreshHomeAuthLine();
+    supabase.auth.onAuthStateChange((_event, _session)=>{
+      refreshAuth();
     });
 
-    async function refreshHomeAuthLine(){
-      const el = document.getElementById("home-auth-line");
-      if (!el) return;
-      const { data } = await supabaseClient.auth.getSession();
-      const session = data?.session;
-      if (session?.user){
-        const name = session.user.user_metadata?.user_name || session.user.email || session.user.id;
-        el.innerHTML = "🔓 Státusz: <b>bejelentkezve</b> – " + name;
-      } else {
-        el.innerHTML = "🔒 Státusz: <span class='muted'>nincs bejelentkezve</span>";
-      }
+    // ---------------- Data loading ----------------
+    async function loadDrivers(){
+      // vár: public.drivers: id, code, name, team
+      const { data, error } = await supabase
+        .from("drivers")
+        .select("id, code, name, team")
+        .order("name", { ascending: true });
+
+      if(error) throw error;
+      driversCache = data || [];
+      return driversCache;
     }
 
-    async function loginWithGithub(){
-      const out = document.getElementById("login-output");
-      if (out) out.textContent = "⏳ GitHub belépés indítása...";
+    async function loadRaces(){
+      // vár: public.races: id, round, name, city, start_date, end_date
+      const { data, error } = await supabase
+        .from("races")
+        .select("id, round, name, city, start_date, end_date")
+        .order("round", { ascending: true });
 
-      // ✅ helyes redirect GitHub Pages-hez
-      const redirectTo = window.location.origin + BASE_PATH + "?auth_callback=1";
+      if(error) throw error;
+      racesCache = data || [];
+      return racesCache;
+    }
 
-      const { error } = await supabaseClient.auth.signInWithOAuth({
-        provider: "github",
-        options: { redirectTo }
+    // ---------------- Races page ----------------
+    function formatRange(r){
+      if(!r.start_date) return "";
+      const s = String(r.start_date).slice(0,10);
+      const e = r.end_date ? String(r.end_date).slice(0,10) : "";
+      return e ? `${s} → ${e}` : s;
+    }
+
+    function renderRaces(){
+      const list = $("races-list");
+      list.innerHTML = "";
+      racesCache.forEach(r=>{
+        const el = document.createElement("div");
+        el.className = "item";
+        el.innerHTML = `
+          <div>
+            <b>Futam #${r.round || "?"} • ${r.name || "Név nélkül"}</b>
+            <div class="muted" style="font-size:12px;margin-top:2px">${r.city || ""} • ${formatRange(r)}</div>
+          </div>
+          <button class="btn small">Tipp ➜</button>
+        `;
+        el.querySelector("button").addEventListener("click", ()=>{
+          goto(`#pick?race=${encodeURIComponent(r.id)}`);
+        });
+        list.appendChild(el);
       });
 
-      if (error && out) out.textContent = "❌ GitHub login hiba: " + error.message;
+      $("races-status").textContent = racesCache.length
+        ? `Betöltve: ${racesCache.length} futam`
+        : "Nincs futam a táblában.";
     }
 
-    async function logout(){
-      const out = document.getElementById("login-output");
-      if (out) out.textContent = "⏳ Kijelentkezés...";
-      const { error } = await supabaseClient.auth.signOut();
-      if (error && out) out.textContent = "❌ Kijelentkezés hiba: " + error.message;
-      if (!error && out) out.textContent = "ℹ️ Kijelentkezve";
-    }
+    // ---------------- Pick page (drag&drop) ----------------
+    function renderSlots(){
+      const wrap = $("slots");
+      wrap.innerHTML = "";
+      for(let i=0;i<5;i++){
+        const d = pickSlots[i];
+        const el = document.createElement("div");
+        el.className = "slot";
+        el.dataset.index = String(i);
+        el.innerHTML = `
+          <div style="display:flex;align-items:center;gap:12px">
+            <div class="num">#${i+1}</div>
+            <div>
+              <div class="name ${d ? "" : "empty"}">${d ? d.name : "Húzz ide egy pilótát"}</div>
+              <div class="muted" style="font-size:12px">${d ? (d.team || "") : ""}</div>
+            </div>
+          </div>
+          <div class="dragHint">${d ? "Húzd át máshova" : ""}</div>
+        `;
 
-    async function testSupabase(){
-      const out = document.getElementById("login-output");
-      if (out) out.textContent = "⏳ Supabase teszt..." ;
-
-      try{
-        const races = await supabaseClient.from("races").select("*", { count:"exact", head:false }).limit(3).order("round",{ascending:true});
-        if (races.error) throw races.error;
-
-        const drivers = await supabaseClient.from("drivers").select("*", { count:"exact", head:false }).limit(3).order("name",{ascending:true});
-        if (drivers.error) throw drivers.error;
-
-        out.textContent =
-          "✅ Supabase OK.\n" +
-          "races: " + (races.count ?? races.data?.length ?? 0) + " rekord (mutat 3-at)\n" +
-          "drivers: " + (drivers.count ?? drivers.data?.length ?? 0) + " rekord (mutat 3-at)";
-      }catch(e){
-        out.textContent = "❌ Supabase teszt hiba: " + (e?.message || String(e));
-      }
-    }
-
-    async function loadRaces(force){
-      const status = document.getElementById("races-status");
-      const list = document.getElementById("races-list");
-      const emptyHelp = document.getElementById("races-empty-help");
-      if (!status || !list) return;
-
-      status.textContent = "⏳ Futamok betöltése...";
-      list.innerHTML = "";
-      if (emptyHelp) emptyHelp.style.display = "none";
-
-      try{
-        const res = await supabaseClient
-          .from("races")
-          .select("id, round, name, location, start_date, end_date")
-          .order("round", { ascending:true })
-          .limit(200);
-
-        if (res.error) throw res.error;
-
-        const rows = res.data || [];
-        if (rows.length === 0){
-          status.textContent = "⚠️ Nincs futam a races táblában.";
-          if (emptyHelp) emptyHelp.style.display = "block";
-          return;
-        }
-
-        status.textContent = "✅ Futamok betöltve: " + rows.length;
-
-        for (const r of rows){
-          const div = document.createElement("div");
-          div.className = "race-item";
-          div.onclick = () => goto("#pick?race=" + encodeURIComponent(r.id));
-
-          const left = document.createElement("div");
-          const title = document.createElement("div");
-          title.className = "race-title";
-          title.textContent = `#${r.round} • ${r.name || "Futam"}`;
-          const meta = document.createElement("div");
-          meta.className = "race-meta";
-          const sd = r.start_date ? String(r.start_date) : "";
-          const ed = r.end_date ? String(r.end_date) : "";
-          meta.textContent = `${r.location || ""}${(sd||ed) ? " • " + sd + (ed ? " → " + ed : "") : ""}`;
-          left.appendChild(title);
-          left.appendChild(meta);
-
-          const right = document.createElement("div");
-          right.className = "race-meta";
-          right.textContent = "Tipp →";
-
-          div.appendChild(left);
-          div.appendChild(right);
-          list.appendChild(div);
-        }
-      }catch(e){
-        status.textContent = "❌ Futam betöltési hiba: " + (e?.message || String(e));
-      }
-    }
-
-    // --------- pick state ----------
-    let currentRaceId = null;
-    let currentRace = null;
-    let driversCache = [];
-    let slots = [null,null,null,null,null];
-
-    function buildSlotsUI(){
-      const el = document.getElementById("slots");
-      if (!el) return;
-      el.innerHTML = "";
-
-      for (let i=0; i<5; i++){
-        const box = document.createElement("div");
-        box.className = "slot" + (slots[i] ? " filled" : "");
-        box.dataset.pos = String(i);
-
-        box.ondragover = (ev) => { ev.preventDefault(); };
-        box.ondrop = (ev) => {
+        // drop target
+        el.addEventListener("dragover", (ev)=>{ ev.preventDefault(); });
+        el.addEventListener("drop", (ev)=>{
           ev.preventDefault();
-          const driverId = ev.dataTransfer.getData("text/driver_id");
-          if (!driverId) return;
-          setSlot(i, driverId);
-        };
+          const driverId = ev.dataTransfer.getData("text/driverId");
+          if(!driverId) return;
+          const drv = driversCache.find(x=>String(x.id)===String(driverId));
+          if(!drv) return;
+          placeDriver(i, drv);
+        });
 
-        const left = document.createElement("div");
-        left.innerHTML = `<strong>#${i+1}</strong>`;
-
-        const right = document.createElement("div");
-        if (slots[i]){
-          const d = driversCache.find(x => x.id === slots[i]);
-          right.textContent = d ? d.name : "(ismeretlen)";
-        }else{
-          right.className = "hint";
-          right.textContent = "Húzd ide a pilótát";
-        }
-
-        box.appendChild(left);
-        box.appendChild(right);
-        el.appendChild(box);
+        wrap.appendChild(el);
       }
     }
 
-    function setSlot(pos, driverId){
-      for (let i=0; i<slots.length; i++){
-        if (slots[i] === driverId) slots[i] = null;
-      }
-      slots[pos] = driverId;
-      buildSlotsUI();
+    function renderDrivers(){
+      const wrap = $("drivers");
+      wrap.innerHTML = "";
+      driversCache.forEach(d=>{
+        const el = document.createElement("div");
+        el.className = "driver";
+        el.draggable = true;
+        el.innerHTML = `
+          <div class="left">
+            <b>${d.name}</b>
+            <span>${d.team || ""}</span>
+          </div>
+          <div class="dragHint">Húzd →</div>
+        `;
+        el.addEventListener("dragstart",(ev)=>{
+          ev.dataTransfer.setData("text/driverId", String(d.id));
+        });
+        wrap.appendChild(el);
+      });
     }
 
-    function clearSlots(){
-      slots = [null,null,null,null,null];
-      buildSlotsUI();
-      const st = document.getElementById("pick-status");
-      if (st) st.textContent = "🧹 Törölve (csak képernyőn).";
+    function placeDriver(slotIndex, driver){
+      // ne legyen ugyanaz a driver több slotban
+      pickSlots = pickSlots.map(x => (x && x.id === driver.id) ? null : x);
+      pickSlots[slotIndex] = driver;
+      renderSlots();
     }
 
-    async function openPickFromHash(){
-      const q = getQueryFromHash();
-      const race = q.get("race");
-      currentRaceId = race;
-      const title = document.getElementById("pick-race-title");
-      const status = document.getElementById("pick-status");
-      const driversEl = document.getElementById("drivers-list");
-      if (driversEl) driversEl.textContent = "Betöltés...";
-
-      if (!race){
-        if (title) title.textContent = "⚠️ Nincs kiválasztott futam (race id hiányzik).";
-        return;
-      }
-
-      const { data: sess } = await supabaseClient.auth.getSession();
-      const user = sess?.session?.user || null;
-      const isAdmin = !!(user?.email && ADMIN_EMAILS.includes(user.email));
-      const adminBox = document.getElementById("admin-box");
-      if (adminBox) adminBox.classList.toggle("hidden", !isAdmin);
-
-      try{
-        const rr = await supabaseClient.from("races")
-          .select("id, round, name, location, start_date, end_date")
-          .eq("id", race)
-          .single();
-
-        if (rr.error) throw rr.error;
-        currentRace = rr.data;
-
-        const sd = currentRace.start_date ? String(currentRace.start_date) : "";
-        const ed = currentRace.end_date ? String(currentRace.end_date) : "";
-        if (title){
-          title.textContent = `Futam: #${currentRace.round} • ${currentRace.name} • ${currentRace.location || ""} ${sd ? " • " + sd + (ed ? " → " + ed : "") : ""}`;
-        }
-      }catch(e){
-        if (title) title.textContent = "❌ Futam betöltési hiba: " + (e?.message || String(e));
-      }
-
-      await loadDrivers();
-
-      slots = [null,null,null,null,null];
-      buildSlotsUI();
-
-      if (user){
-        await loadMyPick();
-      }else{
-        if (status) status.textContent = "ℹ️ Tipp mentéshez jelentkezz be (Belépés menü).";
-      }
+    function clearPick(){
+      pickSlots = [null,null,null,null,null];
+      $("pick-loaded").classList.add("hide");
+      renderSlots();
     }
 
-    async function loadDrivers(){
-      const driversEl = document.getElementById("drivers-list");
-      const status = document.getElementById("pick-status");
-      if (driversEl) driversEl.textContent = "⏳ Pilóták betöltése...";
+    async function loadExistingPick(raceId){
+      $("pick-loaded").classList.add("hide");
+      if(!currentUser) return;
 
-      try{
-        const res = await supabaseClient
-          .from("drivers")
-          .select("id, name, team, avatar_url")
-          .order("name", { ascending:true })
-          .limit(300);
+      // vár: public.picks: user_id, race_id, positions (json)
+      const { data, error } = await supabase
+        .from("picks")
+        .select("positions")
+        .eq("user_id", currentUser.id)
+        .eq("race_id", raceId)
+        .maybeSingle();
 
-        if (res.error) throw res.error;
+      if(error) throw error;
 
-        driversCache = res.data || [];
-        if (driversCache.length === 0){
-          if (driversEl) driversEl.textContent = "⚠️ Nincs pilóta a drivers táblában.";
-          return;
-        }
-
-        driversEl.innerHTML = "";
-        for (const d of driversCache){
-          const row = document.createElement("div");
-          row.className = "driver";
-          row.draggable = true;
-          row.ondragstart = (ev) => {
-            ev.dataTransfer.setData("text/driver_id", d.id);
-          };
-
-          const left = document.createElement("div");
-          left.className = "d-left";
-
-          const av = document.createElement("div");
-          av.className = "avatar";
-          if (d.avatar_url){
-            const img = document.createElement("img");
-            img.src = d.avatar_url;
-            img.alt = d.name;
-            av.appendChild(img);
-          }
-          const info = document.createElement("div");
-          const nm = document.createElement("div");
-          nm.className = "d-name";
-          nm.textContent = d.name;
-          const tm = document.createElement("div");
-          tm.className = "d-team";
-          tm.textContent = d.team || "";
-          info.appendChild(nm);
-          info.appendChild(tm);
-
-          left.appendChild(av);
-          left.appendChild(info);
-
-          const right = document.createElement("div");
-          right.className = "race-meta";
-          right.textContent = "Húzd →";
-
-          row.appendChild(left);
-          row.appendChild(right);
-          driversEl.appendChild(row);
-        }
-
-        if (status) status.textContent = "✅ Pilóták betöltve: " + driversCache.length;
-      }catch(e){
-        if (driversEl) driversEl.textContent = "❌ Pilóta betöltési hiba: " + (e?.message || String(e));
-      }
-    }
-
-    async function loadMyPick(){
-      const status = document.getElementById("pick-status");
-      const { data } = await supabaseClient.auth.getSession();
-      const user = data?.session?.user;
-      if (!user || !currentRaceId) return;
-
-      try{
-        const res = await supabaseClient
-          .from("picks")
-          .select("p1,p2,p3,p4,p5")
-          .eq("user_id", user.id)
-          .eq("race_id", currentRaceId)
-          .maybeSingle();
-
-        if (res.error) throw res.error;
-
-        if (res.data){
-          slots = [
-            res.data.p1 || null,
-            res.data.p2 || null,
-            res.data.p3 || null,
-            res.data.p4 || null,
-            res.data.p5 || null
-          ];
-          buildSlotsUI();
-          if (status) status.textContent = "✅ Korábbi tipped betöltve.";
-        }else{
-          if (status) status.textContent = "ℹ️ Nincs még mentett tipped erre a futamra.";
-        }
-      }catch(e){
-        if (status) status.textContent = "❌ Tipp betöltési hiba: " + (e?.message || String(e));
+      if(data?.positions){
+        // positions: [driver_id,...] vagy [{id,name,team},...]
+        const pos = data.positions;
+        const ids = Array.isArray(pos) ? pos : [];
+        // ha id lista:
+        const resolved = ids.map(v=>{
+          const id = (typeof v === "object" && v) ? v.id : v;
+          return driversCache.find(d=>String(d.id)===String(id)) || null;
+        });
+        pickSlots = [
+          resolved[0]||null, resolved[1]||null, resolved[2]||null, resolved[3]||null, resolved[4]||null
+        ];
+        renderSlots();
+        $("pick-loaded").classList.remove("hide");
       }
     }
 
     async function savePick(){
-      const status = document.getElementById("pick-status");
-      const { data } = await supabaseClient.auth.getSession();
-      const user = data?.session?.user;
-
-      if (!user){
-        if (status) status.textContent = "⚠️ Tipp mentéshez jelentkezz be a Belépés menüben.";
+      if(!currentUser){
+        $("pick-status").textContent = "Mentéshez belépés kell.";
         goto("#login");
         return;
       }
-      if (!currentRaceId){
-        if (status) status.textContent = "⚠️ Nincs futam kiválasztva.";
-        return;
-      }
-      if (slots.some(x => !x)){
-        if (status) status.textContent = "⚠️ Nem teljes a Top5. Töltsd ki mind az 5 helyet.";
+      if(!currentRaceId){
+        $("pick-status").textContent = "Nincs kiválasztott futam.";
         return;
       }
 
-      if (status) status.textContent = "⏳ Tipp mentése...";
+      const positions = pickSlots.map(d=> d ? d.id : null);
 
-      try{
-        const payload = {
-          user_id: user.id,
-          race_id: currentRaceId,
-          p1: slots[0], p2: slots[1], p3: slots[2], p4: slots[3], p5: slots[4],
-          updated_at: new Date().toISOString()
-        };
-
-        const res = await supabaseClient
-          .from("picks")
-          .upsert(payload, { onConflict: "user_id,race_id" });
-
-        if (res.error) throw res.error;
-
-        if (status) status.textContent = "✅ Tipp elmentve!";
-      }catch(e){
-        const msg = (e?.message || String(e));
-        if (status) status.textContent =
-          "❌ Mentési hiba: " + msg +
-          "\n\nHa azt írja, hogy nincs onConflict / unique constraint, akkor kell a DB-be: UNIQUE(user_id, race_id) a picks táblára.";
+      // legalább 1 legyen
+      const hasAny = positions.some(x=>x!==null);
+      if(!hasAny){
+        $("pick-status").textContent = "Nincs mit menteni (üres tipp).";
+        return;
       }
+
+      $("pick-status").textContent = "Mentés...";
+      const { error } = await supabase
+        .from("picks")
+        .upsert(
+          { user_id: currentUser.id, race_id: currentRaceId, positions },
+          { onConflict: "user_id,race_id" }
+        );
+
+      if(error){
+        console.error(error);
+        $("pick-status").textContent = "Hiba mentéskor: " + error.message;
+        return;
+      }
+      $("pick-status").textContent = "Sikeres mentés ✅";
     }
 
     async function deletePick(){
-      const status = document.getElementById("pick-status");
-      const { data } = await supabaseClient.auth.getSession();
-      const user = data?.session?.user;
-
-      if (!user){
-        if (status) status.textContent = "⚠️ Törléshez is be kell jelentkezni.";
-        goto("#login");
-        return;
-      }
-      if (!currentRaceId){
-        if (status) status.textContent = "⚠️ Nincs futam kiválasztva.";
-        return;
-      }
-
-      if (status) status.textContent = "⏳ Tipp törlése...";
-
-      const res = await supabaseClient
+      if(!currentUser || !currentRaceId) return;
+      $("pick-status").textContent = "Tipp törlése...";
+      const { error } = await supabase
         .from("picks")
         .delete()
-        .eq("user_id", user.id)
+        .eq("user_id", currentUser.id)
         .eq("race_id", currentRaceId);
 
-      if (res.error){
-        if (status) status.textContent = "❌ Törlési hiba: " + res.error.message;
+      if(error){
+        console.error(error);
+        $("pick-status").textContent = "Hiba törléskor: " + error.message;
         return;
       }
-
-      slots = [null,null,null,null,null];
-      buildSlotsUI();
-      if (status) status.textContent = "✅ Tipp törölve a DB-ből is.";
+      clearPick();
+      $("pick-status").textContent = "Tipp törölve ✅";
     }
 
-    async function saveResult(){
-      const adminStatus = document.getElementById("admin-status");
-      const { data } = await supabaseClient.auth.getSession();
-      const user = data?.session?.user;
-
-      const isAdmin = !!(user?.email && ADMIN_EMAILS.includes(user.email));
-      if (!isAdmin){
-        if (adminStatus) adminStatus.textContent = "❌ Nem vagy admin.";
-        return;
-      }
-      if (!currentRaceId){
-        if (adminStatus) adminStatus.textContent = "⚠️ Nincs futam kiválasztva.";
-        return;
-      }
-      if (slots.some(x => !x)){
-        if (adminStatus) adminStatus.textContent = "⚠️ Admin eredményhez is töltsd ki mind az 5 helyet.";
-        return;
-      }
-
-      if (adminStatus) adminStatus.textContent = "⏳ Eredmény mentése...";
-
-      try{
-        const payload = {
-          race_id: currentRaceId,
-          r1: slots[0], r2: slots[1], r3: slots[2], r4: slots[3], r5: slots[4],
-          updated_at: new Date().toISOString()
-        };
-
-        const res = await supabaseClient
-          .from("results")
-          .upsert(payload, { onConflict: "race_id" });
-
-        if (res.error) throw res.error;
-
-        if (adminStatus) adminStatus.textContent = "✅ Eredmény elmentve!";
-      }catch(e){
-        const msg = (e?.message || String(e));
-        if (adminStatus) adminStatus.textContent =
-          "❌ Admin mentési hiba: " + msg +
-          "\n\nEllenőrizd, hogy van results tábla és UNIQUE(race_id).";
-      }
+    // ---------------- Router ----------------
+    function parseHash(){
+      const h = (location.hash || "#home").slice(1); // remove #
+      const [route, query] = h.split("?");
+      const params = new URLSearchParams(query || "");
+      return { route: route || "home", params };
     }
 
-    function calcPoints(picksRow, resultRow){
-      const p = [picksRow.p1, picksRow.p2, picksRow.p3, picksRow.p4, picksRow.p5];
-      const r = [resultRow.r1, resultRow.r2, resultRow.r3, resultRow.r4, resultRow.r5];
+    async function onRoute(){
+      const { route, params } = parseHash();
 
-      let pts = 0;
-      for (let i=0;i<5;i++){
-        if (p[i] === r[i]) pts += 3;
-        else if (r.includes(p[i])) pts += 1;
+      if(route === "home"){
+        showPage("home");
+        return;
       }
-      return pts;
-    }
 
-    async function loadRank(force){
-      const out = document.getElementById("rank-output");
-      const st = document.getElementById("rank-status");
-      if (out) out.textContent = "⏳ Betöltés...";
+      if(route === "login"){
+        showPage("login");
+        return;
+      }
 
-      try{
-        const resR = await supabaseClient.from("results").select("race_id,r1,r2,r3,r4,r5");
-        if (resR.error) throw resR.error;
-        const results = resR.data || [];
+      if(route === "standings"){
+        showPage("standings");
+        return;
+      }
 
-        const resP = await supabaseClient.from("picks").select("user_id,race_id,p1,p2,p3,p4,p5");
-        if (resP.error) throw resP.error;
-        const picks = resP.data || [];
+      if(route === "races"){
+        showPage("races");
+        $("races-status").textContent = "Futamok betöltése...";
+        try{
+          await loadRaces();
+          renderRaces();
+        }catch(e){
+          console.error(e);
+          $("races-status").textContent = "Hiba futam betöltésnél: " + (e?.message || e);
+        }
+        return;
+      }
 
-        if (results.length === 0){
-          out.textContent = "⚠️ Még nincs eredmény (results tábla üres).";
-          if (st) st.textContent = "Készen áll.";
+      if(route === "pick"){
+        showPage("pick");
+        const raceId = params.get("race");
+        currentRaceId = raceId;
+
+        if(!raceId){
+          $("pick-title").textContent = "🏁 Tipp oldal";
+          $("pick-sub").textContent = "Nincs race paraméter. Menj vissza a versenynaptárba.";
+          $("pick-status").textContent = "Nincs futam.";
           return;
         }
 
-        const byRace = new Map(results.map(r => [r.race_id, r]));
-        const scoreByUser = new Map();
+        $("pick-status").textContent = "Betöltés...";
+        try{
+          // biztosan legyen driver cache
+          if(!driversCache.length) await loadDrivers();
+          renderDrivers();
+          renderSlots();
 
-        for (const p of picks){
-          const r = byRace.get(p.race_id);
-          if (!r) continue;
-          const pts = calcPoints(p, r);
-          scoreByUser.set(p.user_id, (scoreByUser.get(p.user_id) || 0) + pts);
-        }
-
-        const rows = Array.from(scoreByUser.entries())
-          .map(([user_id, pts]) => ({ user_id, pts }))
-          .sort((a,b) => b.pts - a.pts);
-
-        if (rows.length === 0){
-          out.textContent = "⚠️ Van eredmény, de még nincs hozzá tipp.";
-          if (st) st.textContent = "Készen áll.";
-          return;
-        }
-
-        // ✅ profil nevek betöltése
-        let profMap = new Map();
-        try {
-          const userIds = rows.map(r => r.user_id);
-          if (userIds.length) {
-            const profRes = await supabaseClient
-              .from("profiles")
-              .select("user_id, display_name")
-              .in("user_id", userIds);
-
-            if (!profRes.error) {
-              profMap = new Map((profRes.data || []).map(p => [p.user_id, p.display_name]));
-            }
+          const race = racesCache.find(r=>String(r.id)===String(raceId));
+          if(!racesCache.length) {
+            try { await loadRaces(); } catch {}
           }
-        } catch (e) {
-          console.warn("profiles select failed:", e?.message || e);
+          const r2 = racesCache.find(r=>String(r.id)===String(raceId)) || race;
+          $("pick-title").textContent = `🏁 Tipp oldal (drag & drop)`;
+          $("pick-sub").textContent = r2
+            ? `Futam: #${r2.round || "?"} • ${r2.name || ""} • ${r2.city || ""} • ${formatRange(r2)}`
+            : `Race ID: ${raceId}`;
+
+          clearPick();
+          await refreshAuth();
+          await loadExistingPick(raceId);
+
+          $("pick-status").textContent = "Kész.";
+        }catch(e){
+          console.error(e);
+          $("pick-status").textContent = "Hiba: " + (e?.message || e);
         }
-
-        let txt = "🏆 Ranglista\n\n";
-        rows.forEach((r, idx) => {
-          const nm =
-            profMap.get(r.user_id) ||
-            (r.user_id ? (r.user_id.slice(0,8) + "…") : "ismeretlen");
-
-          txt += `${idx+1}. ${nm}  —  ${r.pts} pont\n`;
-        });
-
-        out.textContent = txt;
-        if (st) st.textContent = "✅ Ranglista frissítve.";
-      }catch(e){
-        out.textContent = "❌ Ranglista hiba: " + (e?.message || String(e));
+        return;
       }
+
+      // default
+      showPage("home");
     }
 
-    (async () => {
-      // auth callback query param takarítás
-      if (window.location.search.includes("auth_callback=1")){
-        const u = new URL(window.location.href);
-        u.searchParams.delete("auth_callback");
-        // a hash maradjon
-        window.history.replaceState({}, "", u.pathname + u.search + u.hash);
+    // ---------------- Buttons wiring ----------------
+    $("go-races").addEventListener("click", ()=>goto("#races"));
+    $("go-login").addEventListener("click", ()=>goto("#login"));
+    $("btn-refresh").addEventListener("click", async ()=>{
+      await refreshAuth();
+      setStatus(currentUser ? "ok" : "warn", currentUser ? "Frissítve ✅" : "Frissítve: nincs belépve.");
+    });
+
+    $("races-back").addEventListener("click", ()=>goto("#home"));
+    $("races-refresh").addEventListener("click", async ()=>{
+      $("races-status").textContent = "Frissítés...";
+      try{
+        await loadRaces();
+        renderRaces();
+      }catch(e){
+        console.error(e);
+        $("races-status").textContent = "Hiba: " + (e?.message || e);
       }
-      await route();
+    });
+
+    $("pick-back").addEventListener("click", ()=>goto("#races"));
+    $("pick-clear").addEventListener("click", ()=>{ clearPick(); $("pick-status").textContent="Ürítve."; });
+    $("pick-save").addEventListener("click", savePick);
+    $("pick-remove").addEventListener("click", deletePick);
+
+    $("login-back").addEventListener("click", ()=>goto("#home"));
+
+    $("btn-signin").addEventListener("click", async ()=>{
+      const email = $("login-email").value.trim();
+      const password = $("login-pass").value;
+      if(!email || !password){ setLoginStatus("warn","Hiányzik email vagy jelszó."); return; }
+      setLoginStatus("warn","Belépés...");
+      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      if(error){ setLoginStatus("bad","Hiba: " + error.message); return; }
+      setLoginStatus("ok","Sikeres belépés ✅");
+      goto("#home");
+    });
+
+    $("btn-signup").addEventListener("click", async ()=>{
+      const email = $("login-email").value.trim();
+      const password = $("login-pass").value;
+      if(!email || !password){ setLoginStatus("warn","Hiányzik email vagy jelszó."); return; }
+      setLoginStatus("warn","Regisztráció...");
+      const { error } = await supabase.auth.signUp({ email, password });
+      if(error){ setLoginStatus("bad","Hiba: " + error.message); return; }
+      setLoginStatus("ok","Regisztráció ok ✅ (ha kell, email megerősítés).");
+      goto("#home");
+    });
+
+    $("btn-signout").addEventListener("click", async ()=>{
+      setLoginStatus("warn","Kijelentkezés...");
+      const { error } = await supabase.auth.signOut();
+      if(error){ setLoginStatus("bad","Hiba: " + error.message); return; }
+      setLoginStatus("ok","Kijelentkezve ✅");
+      goto("#home");
+    });
+
+    // ---------------- Init ----------------
+    window.addEventListener("hashchange", onRoute);
+
+    (async function init(){
+      try{
+        await refreshAuth();
+        // előtöltés (ha ezek hibáznak, akkor is legyen UI)
+        try{ await loadDrivers(); }catch(e){ console.warn("drivers load failed", e); }
+        try{ await loadRaces(); }catch(e){ console.warn("races load failed", e); }
+        onRoute();
+      }catch(e){
+        console.error(e);
+        setStatus("bad", "Inicializálási hiba: " + (e?.message || e));
+      }
     })();
   </script>
 </body>
