@@ -38,10 +38,7 @@
       border-bottom:1px solid var(--border);
       backdrop-filter: blur(10px);
     }
-    .brand{
-      display:flex; gap:10px; align-items:center;
-      font-weight:800; letter-spacing:.4px;
-    }
+    .brand{display:flex; gap:10px; align-items:center; font-weight:800; letter-spacing:.4px;}
     .pill{
       width:38px;height:38px;border-radius:999px;
       background:linear-gradient(135deg, var(--red2), var(--red));
@@ -52,10 +49,8 @@
     }
     .nav{display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-end}
     .nav a{
-      text-decoration:none;
-      color:var(--text);
-      padding:10px 14px;
-      border-radius:14px;
+      text-decoration:none; color:var(--text);
+      padding:10px 14px; border-radius:14px;
       background:rgba(0,0,0,.35);
       border:1px solid var(--border);
       font-weight:700;
@@ -79,29 +74,19 @@
     .row{display:flex; gap:14px; flex-wrap:wrap}
     .col{flex:1; min-width:280px}
     .btn{
-      cursor:pointer;
-      border:none;
-      padding:12px 14px;
-      border-radius:14px;
-      color:white;
-      font-weight:800;
+      cursor:pointer; border:none;
+      padding:12px 14px; border-radius:14px;
+      color:white; font-weight:800;
       background:linear-gradient(135deg, var(--btn), var(--btn2));
       box-shadow:0 12px 26px rgba(0,0,0,.35);
       display:inline-flex; gap:10px; align-items:center;
     }
-    .btn.secondary{
-      background:rgba(0,0,0,.35);
-      border:1px solid var(--border);
-      box-shadow:none;
-      color:var(--text);
-    }
+    .btn.secondary{background:rgba(0,0,0,.35); border:1px solid var(--border); box-shadow:none; color:var(--text);}
     .btn.small{padding:10px 12px; border-radius:12px; font-weight:800}
     .muted{color:var(--muted)}
     .status{
-      margin-top:14px;
-      padding:12px 14px;
-      border-radius:14px;
-      border:1px solid var(--border);
+      margin-top:14px; padding:12px 14px;
+      border-radius:14px; border:1px solid var(--border);
       background:rgba(0,0,0,.25);
       display:flex; gap:10px; align-items:center;
       min-height:44px;
@@ -110,34 +95,28 @@
     .dot.ok{background:var(--ok)}
     .dot.warn{background:var(--warn)}
     .dot.bad{background:#ff3b3b}
-    .foot{
-      opacity:.7;
-      text-align:center;
-      padding:18px 10px 30px;
-      font-size:13px;
-    }
+    .foot{opacity:.7; text-align:center; padding:18px 10px 30px; font-size:13px;}
 
     .list{display:grid; gap:10px;}
     .item{
-      padding:12px 14px;
-      border-radius:14px;
+      padding:12px 14px; border-radius:14px;
       border:1px solid var(--border);
       background:rgba(0,0,0,.25);
-      display:flex;
-      justify-content:space-between;
-      gap:10px;
-      align-items:center;
+      display:flex; justify-content:space-between;
+      gap:10px; align-items:center;
     }
     .item b{font-size:15px}
     .tag{
       font-size:12px;
-      padding:6px 10px;
-      border-radius:999px;
+      padding:6px 10px; border-radius:999px;
       background:rgba(216,35,42,.22);
       border:1px solid rgba(216,35,42,.35);
       color:var(--text);
       white-space:nowrap;
     }
+    .tag.ok{background:rgba(31,191,107,.14); border:1px solid rgba(31,191,107,.35)}
+    .tag.warn{background:rgba(255,176,32,.14); border:1px solid rgba(255,176,32,.35)}
+    .tag.bad{background:rgba(255,59,59,.14); border:1px solid rgba(255,59,59,.35)}
 
     .pickGrid{display:grid; grid-template-columns: 1fr 1fr; gap:14px}
     @media(max-width:900px){ .pickGrid{grid-template-columns:1fr} }
@@ -147,10 +126,7 @@
       border-radius:16px;
       padding:12px;
       min-height:62px;
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:12px;
+      display:flex; align-items:center; justify-content:space-between; gap:12px;
     }
     .slot .num{
       width:40px;height:40px;border-radius:14px;
@@ -162,8 +138,7 @@
     .slot .name{font-weight:850}
     .slot .empty{opacity:.55}
     .driverList{
-      max-height:420px;
-      overflow:auto;
+      max-height:420px; overflow:auto;
       border:1px solid var(--border);
       border-radius:16px;
       background:rgba(0,0,0,.18);
@@ -179,7 +154,6 @@
     .driver .left b{font-size:14px}
     .driver .left span{font-size:12px; opacity:.7}
     .dragHint{opacity:.7; font-weight:800; font-size:12px}
-
     .okline{
       margin-top:12px;
       padding:10px 12px;
@@ -190,7 +164,7 @@
       font-weight:800;
     }
     .hide{display:none!important}
-    input{
+    input, select{
       width:100%;
       padding:12px 12px;
       border-radius:14px;
@@ -201,6 +175,10 @@
       font-size:14px;
     }
     label{font-size:12px; opacity:.8; font-weight:800}
+    table{width:100%; border-collapse:collapse}
+    th, td{padding:10px 8px; border-bottom:1px solid rgba(255,255,255,.10); text-align:left; font-size:14px}
+    th{opacity:.85}
+    .right{text-align:right}
   </style>
 </head>
 <body>
@@ -215,17 +193,18 @@
       <a href="#races" data-route="races">Versenynaptár</a>
       <a href="#standings" data-route="standings">Ranglista</a>
       <a href="#login" data-route="login">Belépés</a>
+      <a href="#admin" data-route="admin" id="nav-admin" class="hide">Admin</a>
     </div>
   </div>
 
   <div class="wrap">
     <section class="card" id="page-home">
       <div class="card-h">
-        <div class="tag">MVP • Futamlista → Tipp oldal (drag & drop) + Ranglista</div>
+        <div class="tag">MVP • Futamlista → Tipp oldal + ✅ jelölés + Pontozás + Admin</div>
         <h2 style="margin-top:12px;font-size:44px;letter-spacing:.3px">F1 2026 Tipp Liga</h2>
         <div class="muted" style="max-width:760px">
-          Főoldalon futamnaptár. Futamot kiválasztva külön Tipp oldalon húzod be az 1–5. helyre a pilótákat.
-          Mentés Supabase-be.
+          Tippelj futamonként 1–5 helyre. A versenynaptár jelzi, ha már mentettél.
+          Admin oldalon rögzíted a valós top5-öt → Ranglista pontoz.
         </div>
       </div>
       <div class="card-b">
@@ -245,7 +224,7 @@
     <section class="card hide" id="page-races" style="margin-top:16px">
       <div class="card-h">
         <h2>🗓️ Versenynaptár</h2>
-        <div class="muted">Kattints egy futamra → átvisz a Tipp oldalra.</div>
+        <div class="muted">✅ jelöli, ha már van mentett tipped.</div>
       </div>
       <div class="card-b">
         <div class="row">
@@ -277,9 +256,7 @@
           <div class="col">
             <div class="tag" style="display:inline-block;margin-bottom:10px">Helyezések (1–5)</div>
             <div id="slots"></div>
-            <div class="okline hide" id="pick-loaded">
-              ✅ Korábbi tipped betöltve.
-            </div>
+            <div class="okline hide" id="pick-loaded">✅ Korábbi tipped betöltve.</div>
           </div>
           <div class="col">
             <div class="tag" style="display:inline-block;margin-bottom:10px">Pilóták</div>
@@ -298,7 +275,7 @@
     <section class="card hide" id="page-login" style="margin-top:16px">
       <div class="card-h">
         <h2>🔐 Belépés</h2>
-        <div class="muted">Email + jelszó (Supabase Auth). Ha nincs fiók, regisztrál.</div>
+        <div class="muted">Email + jelszó (Supabase Auth).</div>
       </div>
       <div class="card-b">
         <div class="row">
@@ -328,12 +305,68 @@
     <section class="card hide" id="page-standings" style="margin-top:16px">
       <div class="card-h">
         <h2>🏆 Ranglista</h2>
-        <div class="muted">MVP-ben itt most csak a váz van (később pontszámítás).</div>
+        <div class="muted">
+          Pontozás: +5 pont ha helyes pozíció, +2 pont ha benne van a top5-ben, de rossz helyen.
+          (Admin rögzíti a valós top5-öt.)
+        </div>
       </div>
       <div class="card-b">
+        <div class="row">
+          <button class="btn small" id="standings-refresh">🔄 Ranglista frissítése</button>
+        </div>
+
         <div class="status">
           <span class="dot warn"></span>
-          <span>Hamarosan: pontszámítás + toplista (Supabase-ből).</span>
+          <span id="standings-status">Betöltés...</span>
+        </div>
+
+        <div style="margin-top:14px; overflow:auto">
+          <table>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Játékos (email)</th>
+                <th class="right">Pont</th>
+                <th class="right">Futamok</th>
+              </tr>
+            </thead>
+            <tbody id="standings-body"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section class="card hide" id="page-admin" style="margin-top:16px">
+      <div class="card-h">
+        <h2>🛠️ Admin – Valós eredmény rögzítése</h2>
+        <div class="muted">Itt állítod be futamonként a valós top5-öt. Csak admin emaillel látszik.</div>
+      </div>
+      <div class="card-b">
+        <div class="row">
+          <div class="col">
+            <label>Futam</label>
+            <select id="admin-race"></select>
+          </div>
+          <div class="col">
+            <label>Státusz</label>
+            <div class="status" style="margin-top:6px">
+              <span class="dot warn" id="admin-dot"></span>
+              <span id="admin-status">Betöltés...</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="row" style="margin-top:14px">
+          <div class="col"><label>1. hely</label><select id="ar1"></select></div>
+          <div class="col"><label>2. hely</label><select id="ar2"></select></div>
+          <div class="col"><label>3. hely</label><select id="ar3"></select></div>
+        </div>
+        <div class="row" style="margin-top:14px">
+          <div class="col"><label>4. hely</label><select id="ar4"></select></div>
+          <div class="col"><label>5. hely</label><select id="ar5"></select></div>
+          <div class="col" style="display:flex; align-items:end; gap:12px">
+            <button class="btn" id="admin-save">💾 Eredmény mentése</button>
+          </div>
         </div>
       </div>
     </section>
@@ -341,22 +374,19 @@
     <div class="foot">© F1 Tipp Liga 2026 • GitHub Pages • Supabase</div>
   </div>
 
-  <!-- Supabase UMD -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 
   <script>
-    // ==============================================================
-    // ✅ SUPABASE KONFIG
-    // ==============================================================
     const SUPABASE_URL = "https://mtobtiwoiqqxdkduvjmf.supabase.co";
     const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im10b2J0aXdvaXFxeGRrZHV2am1mIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjgxMTY2NzAsImV4cCI6MjA4MzY5MjY3MH0.qB5tb9uj2GN4iKRvyZnv_lVRZ9xnlgtY3rN6oZV_LDc";
 
-    // ✅ VÉDELEM: ha már létrejött, ne hozzuk létre újra
+    // ÍRD BE A SAJÁT EMAIL CÍMEDET IDE:
+    const ADMIN_EMAILS = ["IDE@AZ.EMAIL.CIMED"];
+
     const sb = window.sb || (window.sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
       auth: { persistSession: true, autoRefreshToken: true, storage: window.localStorage }
     }));
 
-    // ---------------- UI helpers ----------------
     const $ = (id)=>document.getElementById(id);
     const setActiveNav = (route)=>{
       document.querySelectorAll("#nav a").forEach(a=>{
@@ -364,21 +394,22 @@
       });
     };
     const showPage = (route)=>{
-      const pages = ["home","races","pick","login","standings"];
+      const pages = ["home","races","pick","login","standings","admin"];
       pages.forEach(p => $("page-"+p).classList.add("hide"));
       $("page-"+route).classList.remove("hide");
       setActiveNav(route);
     };
     const goto = (hash)=>{ location.hash = hash; };
 
-    // ---------------- App state ----------------
     let currentUser = null;
     let racesCache = [];
     let driversCache = [];
     let currentRaceId = null;
     let pickSlots = [null,null,null,null,null];
 
-    // ---------------- Status UI ----------------
+    // ✅ itt tároljuk: mely futamokra van már tipped
+    let myPickRaceIds = new Set();
+
     function setStatus(kind, text){
       const dot = $("status-dot");
       dot.classList.remove("ok","warn","bad");
@@ -391,30 +422,39 @@
       dot.classList.add(kind);
       $("login-status").textContent = text;
     }
+    function setAdminStatus(kind, text){
+      const dot = $("admin-dot");
+      dot.classList.remove("ok","warn","bad");
+      dot.classList.add(kind);
+      $("admin-status").textContent = text;
+    }
 
-    // ---------------- Auth ----------------
     async function refreshAuth(){
       const { data, error } = await sb.auth.getUser();
       if(error){
-        console.warn(error);
         currentUser = null;
         setStatus("warn", "Auth hiba (nincs belépve).");
         setLoginStatus("warn", "Nincs belépve.");
-        return;
+      } else {
+        currentUser = data?.user ?? null;
+        if(currentUser){
+          setStatus("ok", "Bejelentkezve: " + (currentUser.email || "felhasználó"));
+          setLoginStatus("ok", "Bejelentkezve: " + (currentUser.email || "felhasználó"));
+        }else{
+          setStatus("warn", "Nincs belépve. A mentéshez belépés kell.");
+          setLoginStatus("warn", "Nincs belépve.");
+        }
       }
-      currentUser = data?.user ?? null;
-      if(currentUser){
-        setStatus("ok", "Bejelentkezve: " + (currentUser.email || "felhasználó"));
-        setLoginStatus("ok", "Bejelentkezve: " + (currentUser.email || "felhasználó"));
-      }else{
-        setStatus("warn", "Nincs belépve. A mentéshez belépés kell.");
-        setLoginStatus("warn", "Nincs belépve.");
-      }
+
+      // Admin menü csak adminnak
+      const isAdmin = !!currentUser && ADMIN_EMAILS.includes(currentUser.email);
+      $("nav-admin").classList.toggle("hide", !isAdmin);
+
+      return currentUser;
     }
 
     sb.auth.onAuthStateChange(()=>{ refreshAuth(); });
 
-    // ---------------- Data loading ----------------
     async function loadDrivers(){
       const { data, error } = await sb
         .from("drivers")
@@ -425,7 +465,6 @@
       return driversCache;
     }
 
-    // ✅ races: city helyett location
     async function loadRaces(){
       const { data, error } = await sb
         .from("races")
@@ -443,16 +482,36 @@
       return e ? `${s} → ${e}` : s;
     }
 
-    // ---------------- Races page ----------------
+    // ✅ lekérjük az én tippjeimet és Set-be tesszük a race_id-kat
+    async function loadMyPickFlags(){
+      myPickRaceIds = new Set();
+      if(!currentUser) return myPickRaceIds;
+
+      const { data, error } = await sb
+        .from("picks")
+        .select("race_id")
+        .eq("user_id", currentUser.id);
+
+      if(error) throw error;
+      (data || []).forEach(x => myPickRaceIds.add(String(x.race_id)));
+      return myPickRaceIds;
+    }
+
     function renderRaces(){
       const list = $("races-list");
       list.innerHTML = "";
       racesCache.forEach(r=>{
         const el = document.createElement("div");
         el.className = "item";
+
+        const hasPick = myPickRaceIds.has(String(r.id));
+        const badge = hasPick
+          ? `<span class="tag ok">✅ Mentve</span>`
+          : `<span class="tag warn">⏳ Nincs tipp</span>`;
+
         el.innerHTML = `
           <div>
-            <b>Futam #${r.round || "?"} • ${r.name || "Név nélkül"}</b>
+            <b>Futam #${r.round || "?"} • ${r.name || "Név nélkül"} ${badge}</b>
             <div class="muted" style="font-size:12px;margin-top:2px">${r.location || ""} • ${formatRange(r)}</div>
           </div>
           <button class="btn small">Tipp ➜</button>
@@ -468,7 +527,6 @@
         : "Nincs futam a táblában.";
     }
 
-    // ---------------- Pick page (drag&drop) ----------------
     function renderSlots(){
       const wrap = $("slots");
       wrap.innerHTML = "";
@@ -533,7 +591,6 @@
       renderSlots();
     }
 
-    // ✅ picks: positions helyett p1..p5
     async function loadExistingPick(raceId){
       $("pick-loaded").classList.add("hide");
       if(!currentUser) return;
@@ -561,7 +618,6 @@
       }
     }
 
-    // ✅ Mentés: a tábládban p1..p5 NOT NULL, ezért mind az 5-nek meg kell lennie
     async function savePick(){
       if(!currentUser){
         $("pick-status").textContent = "Mentéshez belépés kell.";
@@ -599,6 +655,10 @@
         $("pick-status").textContent = "Hiba mentéskor: " + error.message;
         return;
       }
+
+      // ✅ frissítjük a jelöléseket is
+      myPickRaceIds.add(String(currentRaceId));
+
       $("pick-status").textContent = "Sikeres mentés ✅";
     }
 
@@ -616,11 +676,164 @@
         $("pick-status").textContent = "Hiba törléskor: " + error.message;
         return;
       }
+      myPickRaceIds.delete(String(currentRaceId));
       clearPick();
       $("pick-status").textContent = "Tipp törölve ✅";
     }
 
-    // ---------------- Router ----------------
+    // ===================== PONTOZÁS =====================
+    // +5 ha pontos hely, +2 ha top5-ben szerepel, de máshol
+    function scorePick(pickIds, resultIds){
+      let pts = 0;
+      for(let i=0;i<5;i++){
+        if(pickIds[i] && resultIds[i] && String(pickIds[i]) === String(resultIds[i])) pts += 5;
+        else if(pickIds[i] && resultIds.includes(String(pickIds[i]))) pts += 2;
+      }
+      return pts;
+    }
+
+    async function loadStandings(){
+      if(!currentUser){
+        $("standings-status").textContent = "Ranglistához kérlek lépj be.";
+        $("standings-body").innerHTML = "";
+        return;
+      }
+
+      $("standings-status").textContent = "Betöltés...";
+      $("standings-body").innerHTML = "";
+
+      // 1) összes valós eredmény
+      const rr = await sb.from("race_results").select("race_id,r1,r2,r3,r4,r5");
+      if(rr.error){
+        $("standings-status").textContent = "Hiba: race_results nem olvasható: " + rr.error.message;
+        return;
+      }
+      const resultsMap = new Map();
+      (rr.data||[]).forEach(x=>{
+        resultsMap.set(String(x.race_id), [x.r1,x.r2,x.r3,x.r4,x.r5].map(String));
+      });
+
+      // 2) összes tipp
+      const pk = await sb.from("picks").select("user_id,race_id,p1,p2,p3,p4,p5");
+      if(pk.error){
+        $("standings-status").textContent = "Hiba: picks nem olvasható: " + pk.error.message;
+        return;
+      }
+
+      // 3) játékosonként összegzés
+      const byUser = new Map();
+      (pk.data||[]).forEach(p=>{
+        const raceId = String(p.race_id);
+        const res = resultsMap.get(raceId);
+        if(!res) return; // csak olyan futam számít, ahol van valós eredmény
+        const pickIds = [p.p1,p.p2,p.p3,p.p4,p.p5].map(String);
+        const pts = scorePick(pickIds, res);
+
+        const uid = String(p.user_id);
+        if(!byUser.has(uid)) byUser.set(uid, { user_id: uid, points: 0, races: 0, email: "" });
+        const u = byUser.get(uid);
+        u.points += pts;
+        u.races += 1;
+      });
+
+      // 4) email-ek (auth.users miatt kliensből nem olvasható biztosan)
+      // ezért egyszerűen user_id-t mutatunk, de ha szeretnéd, csinálunk külön "profiles" táblát képpel/logóval.
+      // (A következő körben ezt csináljuk meg, oké?)
+      const arr = Array.from(byUser.values()).sort((a,b)=>b.points-a.points);
+
+      if(arr.length === 0){
+        $("standings-status").textContent = "Még nincs pontozható futam (nincs admin által rögzített eredmény).";
+        return;
+      }
+
+      arr.forEach((u, idx)=>{
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${idx+1}</td>
+          <td><span class="muted">${u.user_id}</span></td>
+          <td class="right"><b>${u.points}</b></td>
+          <td class="right">${u.races}</td>
+        `;
+        $("standings-body").appendChild(tr);
+      });
+
+      $("standings-status").textContent = `Kész. Pontozott futamok: ${resultsMap.size}`;
+    }
+
+    // ===================== ADMIN =====================
+    function fillDriverSelect(selId){
+      const sel = $(selId);
+      sel.innerHTML = "";
+      driversCache.forEach(d=>{
+        const opt = document.createElement("option");
+        opt.value = String(d.id);
+        opt.textContent = `${d.name} (${d.team || ""})`;
+        sel.appendChild(opt);
+      });
+    }
+
+    function fillRaceSelect(){
+      const sel = $("admin-race");
+      sel.innerHTML = "";
+      racesCache.forEach(r=>{
+        const opt = document.createElement("option");
+        opt.value = String(r.id);
+        opt.textContent = `#${r.round || "?"} • ${r.name || ""} • ${r.location || ""}`;
+        sel.appendChild(opt);
+      });
+    }
+
+    async function loadAdminExisting(raceId){
+      setAdminStatus("warn","Eredmény ellenőrzése...");
+      const { data, error } = await sb
+        .from("race_results")
+        .select("r1,r2,r3,r4,r5")
+        .eq("race_id", raceId)
+        .maybeSingle();
+
+      if(error){
+        setAdminStatus("bad","Hiba: " + error.message);
+        return;
+      }
+
+      if(data){
+        $("ar1").value = String(data.r1);
+        $("ar2").value = String(data.r2);
+        $("ar3").value = String(data.r3);
+        $("ar4").value = String(data.r4);
+        $("ar5").value = String(data.r5);
+        setAdminStatus("ok","Van már mentett eredmény ehhez a futamhoz.");
+      }else{
+        setAdminStatus("warn","Nincs még mentett eredmény, állítsd be a top5-öt.");
+      }
+    }
+
+    async function saveRaceResult(){
+      if(!currentUser || !ADMIN_EMAILS.includes(currentUser.email)){
+        setAdminStatus("bad","Nincs admin jogosultság.");
+        return;
+      }
+      const raceId = $("admin-race").value;
+      const payload = {
+        race_id: raceId,
+        r1: $("ar1").value,
+        r2: $("ar2").value,
+        r3: $("ar3").value,
+        r4: $("ar4").value,
+        r5: $("ar5").value,
+        updated_at: new Date().toISOString()
+      };
+
+      setAdminStatus("warn","Mentés...");
+      const { error } = await sb.from("race_results").upsert(payload, { onConflict: "race_id" });
+      if(error){
+        setAdminStatus("bad","Hiba mentéskor: " + error.message);
+        return;
+      }
+      setAdminStatus("ok","Eredmény mentve ✅");
+    }
+
+    // ===================== ROUTER =====================
     function parseHash(){
       const h = (location.hash || "#home").slice(1);
       const [route, query] = h.split("?");
@@ -633,13 +846,48 @@
 
       if(route === "home"){ showPage("home"); return; }
       if(route === "login"){ showPage("login"); return; }
-      if(route === "standings"){ showPage("standings"); return; }
+
+      if(route === "standings"){
+        showPage("standings");
+        await refreshAuth();
+        await loadStandings();
+        return;
+      }
+
+      if(route === "admin"){
+        showPage("admin");
+        await refreshAuth();
+
+        if(!currentUser || !ADMIN_EMAILS.includes(currentUser.email)){
+          setAdminStatus("bad","Nincs admin jogosultság ehhez az oldalhoz.");
+          return;
+        }
+
+        try{
+          if(!driversCache.length) await loadDrivers();
+          if(!racesCache.length) await loadRaces();
+          fillRaceSelect();
+          ["ar1","ar2","ar3","ar4","ar5"].forEach(fillDriverSelect);
+
+          const raceId = $("admin-race").value;
+          await loadAdminExisting(raceId);
+
+          $("admin-race").onchange = async ()=> loadAdminExisting($("admin-race").value);
+
+          setAdminStatus("ok","Admin oldal kész.");
+        }catch(e){
+          setAdminStatus("bad","Hiba: " + (e?.message || e));
+        }
+        return;
+      }
 
       if(route === "races"){
         showPage("races");
         $("races-status").textContent = "Futamok betöltése...";
         try{
+          await refreshAuth();
           await loadRaces();
+          await loadMyPickFlags();
           renderRaces();
         }catch(e){
           console.error(e);
@@ -688,7 +936,7 @@
       showPage("home");
     }
 
-    // ---------------- Buttons wiring ----------------
+    // ===================== BUTTONS =====================
     $("go-races").addEventListener("click", ()=>goto("#races"));
     $("go-login").addEventListener("click", ()=>goto("#login"));
     $("btn-refresh").addEventListener("click", async ()=>{
@@ -699,8 +947,15 @@
     $("races-back").addEventListener("click", ()=>goto("#home"));
     $("races-refresh").addEventListener("click", async ()=>{
       $("races-status").textContent = "Frissítés...";
-      try{ await loadRaces(); renderRaces(); }
-      catch(e){ console.error(e); $("races-status").textContent = "Hiba: " + (e?.message || e); }
+      try{
+        await refreshAuth();
+        await loadRaces();
+        await loadMyPickFlags();
+        renderRaces();
+      }catch(e){
+        console.error(e);
+        $("races-status").textContent = "Hiba: " + (e?.message || e);
+      }
     });
 
     $("pick-back").addEventListener("click", ()=>goto("#races"));
@@ -728,7 +983,7 @@
       setLoginStatus("warn","Regisztráció...");
       const { error } = await sb.auth.signUp({ email, password });
       if(error){ setLoginStatus("bad","Hiba: " + error.message); return; }
-      setLoginStatus("ok","Regisztráció ok ✅ (ha kell, email megerősítés).");
+      setLoginStatus("ok","Regisztráció ok ✅");
       goto("#home");
     });
 
@@ -740,7 +995,10 @@
       goto("#home");
     });
 
-    // ---------------- Init ----------------
+    $("standings-refresh").addEventListener("click", loadStandings);
+    $("admin-save").addEventListener("click", saveRaceResult);
+
+    // ===================== INIT =====================
     window.addEventListener("hashchange", onRoute);
 
     (async function init(){
