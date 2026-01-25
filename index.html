@@ -366,6 +366,35 @@
           <div class="col"><label>5. hely</label><select id="ar5"></select></div>
           <div class="col" style="display:flex; align-items:end; gap:12px">
             <button class="btn" id="admin-save">💾 Eredmény mentése</button>
+            <hr style="border:0;border-top:1px solid rgba(255,255,255,.10);margin:18px 0">
+
+<h3 style="margin:0 0 10px 0">👥 Csapat összeállítás (2 fő / csapat)</h3>
+<div class="muted" style="margin-bottom:12px">
+  Szabály: 1 user csak 1 csapatban lehet. Mentéskor automatikusan kivesszük máshonnan.
+</div>
+
+<div class="row">
+  <div class="col">
+    <label>Csapat</label>
+    <select id="admin-team"></select>
+  </div>
+  <div class="col">
+    <label>Státusz</label>
+    <div class="status" style="margin-top:6px">
+      <span class="dot warn" id="team-dot"></span>
+      <span id="team-status">Betöltés...</span>
+    </div>
+  </div>
+</div>
+
+<div class="row" style="margin-top:14px">
+  <div class="col"><label>Tag #1</label><select id="tm1"></select></div>
+  <div class="col"><label>Tag #2</label><select id="tm2"></select></div>
+  <div class="col" style="display:flex; align-items:end; gap:12px">
+    <button class="btn" id="team-save">💾 Csapat mentése</button>
+  </div>
+</div>
+
           </div>
         </div>
       </div>
