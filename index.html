@@ -656,9 +656,7 @@
         return;
       }
 
-      // ✅ frissítjük a jelöléseket is
       myPickRaceIds.add(String(currentRaceId));
-
       $("pick-status").textContent = "Sikeres mentés ✅";
     }
 
@@ -682,16 +680,20 @@
     }
 
     // ===================== PONTOZÁS =====================
-    // +3 ha pontos hely, +1 ha top5-ben szerepel, de máshol
     function scorePick(pickIds, resultIds){
       let pts = 0;
+      const res = resultIds.map(x => String(x));
       for(let i=0;i<5;i++){
-        if(pickIds[i] && resultIds[i] && String(pickIds[i]) === String(resultIds[i])) pts += 3;
-        else if(pickIds[i] && resultIds.includes(String(pickIds[i]))) pts += 1;
+        const pid = pickIds[i] ? String(pickIds[i]) : "";
+        if(!pid) continue;
+        if(res[i] && pid === res[i]) pts += 3;
+        else if(res.includes(pid)) pts += 1;
       }
       return pts;
     }
 
+    // ===================== RANGLISTA =====================
+    // VÁLTOZÁS: race_results NEM r1..r5, hanem 5 sor / futam (position 1..5, driver_id)
     async function loadStandings(){
       if(!currentUser){
         $("standings-status").textContent = "Ranglistához kérlek lépj be.";
@@ -702,16 +704,33 @@
       $("standings-status").textContent = "Betöltés...";
       $("standings-body").innerHTML = "";
 
-      // 1) összes valós eredmény
-      const rr = await sb.from("race_results").select("race_id,r1,r2,r3,r4,r5");
+      // 1) összes valós eredmény (5 sor / futam)
+      const rr = await sb
+        .from("race_results")
+        .select("race_id, position, driver_id")
+        .order("race_id", { ascending: true })
+        .order("position", { ascending: true });
+
       if(rr.error){
         $("standings-status").textContent = "Hiba: race_results nem olvasható: " + rr.error.message;
         return;
       }
-      const resultsMap = new Map();
-      (rr.data||[]).forEach(x=>{
-        resultsMap.set(String(x.race_id), [x.r1,x.r2,x.r3,x.r4,x.r5].map(String));
+
+      // resultsMap: race_id -> [d1..d5]
+      const tmp = new Map();
+      (rr.data || []).forEach(row=>{
+        const rid = String(row.race_id);
+        const pos = Number(row.position);
+        const did = row.driver_id ? String(row.driver_id) : null;
+        if(!tmp.has(rid)) tmp.set(rid, [null,null,null,null,null]);
+        if(pos >= 1 && pos <= 5) tmp.get(rid)[pos-1] = did;
       });
+
+      // csak azok a futamok pontozhatók, ahol mind az 5 megvan
+      const resultsMap = new Map();
+      for(const [rid, arr] of tmp.entries()){
+        if(arr.every(x => !!x)) resultsMap.set(rid, arr);
+      }
 
       // 2) összes tipp
       const pk = await sb.from("picks").select("user_id,race_id,p1,p2,p3,p4,p5");
@@ -725,24 +744,27 @@
       (pk.data||[]).forEach(p=>{
         const raceId = String(p.race_id);
         const res = resultsMap.get(raceId);
-        if(!res) return; // csak olyan futam számít, ahol van valós eredmény
-        const pickIds = [p.p1,p.p2,p.p3,p.p4,p.p5].map(String);
+        if(!res) return;
+
+        const pickIds = [p.p1,p.p2,p.p3,p.p4,p.p5].map(x => x ? String(x) : "");
         const pts = scorePick(pickIds, res);
 
         const uid = String(p.user_id);
-        if(!byUser.has(uid)) byUser.set(uid, { user_id: uid, points: 0, races: 0, email: "" });
+        if(!byUser.has(uid)) byUser.set(uid, { user_id: uid, points: 0, races: 0 });
         const u = byUser.get(uid);
         u.points += pts;
         u.races += 1;
       });
 
-      // 4) email-ek (auth.users miatt kliensből nem olvasható biztosan)
-      // ezért egyszerűen user_id-t mutatunk, de ha szeretnéd, csinálunk külön "profiles" táblát képpel/logóval.
-      // (A következő körben ezt csináljuk meg, oké?)
       const arr = Array.from(byUser.values()).sort((a,b)=>b.points-a.points);
 
+      if(resultsMap.size === 0){
+        $("standings-status").textContent = "Még nincs pontozható futam (Admin oldalon mentsd el a top5-öt).";
+        return;
+      }
+
       if(arr.length === 0){
-        $("standings-status").textContent = "Még nincs pontozható futam (nincs admin által rögzített eredmény).";
+        $("standings-status").textContent = "Van eredmény, de még nincs tipp azon a futamon.";
         return;
       }
 
@@ -757,7 +779,7 @@
         $("standings-body").appendChild(tr);
       });
 
-      $("standings-status").textContent = `Kész. Pontozott futamok: ${resultsMap.size}`;
+      $("standings-status").textContent = `Kész. Pontozható futamok: ${resultsMap.size}`;
     }
 
     // ===================== ADMIN =====================
@@ -783,54 +805,84 @@
       });
     }
 
+    // VÁLTOZÁS: admin betöltés position alapján
     async function loadAdminExisting(raceId){
       setAdminStatus("warn","Eredmény ellenőrzése...");
+
       const { data, error } = await sb
         .from("race_results")
-        .select("r1,r2,r3,r4,r5")
+        .select("position, driver_id")
         .eq("race_id", raceId)
-        .maybeSingle();
+        .order("position", { ascending: true });
 
       if(error){
         setAdminStatus("bad","Hiba: " + error.message);
         return;
       }
 
-      if(data){
-        $("ar1").value = String(data.r1);
-        $("ar2").value = String(data.r2);
-        $("ar3").value = String(data.r3);
-        $("ar4").value = String(data.r4);
-        $("ar5").value = String(data.r5);
-        setAdminStatus("ok","Van már mentett eredmény ehhez a futamhoz.");
+      if(data && data.length){
+        // alapértékek
+        const arr = [null,null,null,null,null];
+        data.forEach(r=>{
+          const pos = Number(r.position);
+          if(pos>=1 && pos<=5) arr[pos-1] = String(r.driver_id);
+        });
+
+        if(arr.every(Boolean)){
+          $("ar1").value = arr[0];
+          $("ar2").value = arr[1];
+          $("ar3").value = arr[2];
+          $("ar4").value = arr[3];
+          $("ar5").value = arr[4];
+          setAdminStatus("ok","Van már mentett eredmény ehhez a futamhoz.");
+        } else {
+          setAdminStatus("warn","Van részleges eredmény. Állítsd be mind az 5 helyet és mentsd el.");
+        }
       }else{
         setAdminStatus("warn","Nincs még mentett eredmény, állítsd be a top5-öt.");
       }
     }
 
+    // VÁLTOZÁS: admin mentés 5 sorral (delete + insert), nem r1..r5 upsert
     async function saveRaceResult(){
       if(!currentUser || !ADMIN_EMAILS.includes(currentUser.email)){
         setAdminStatus("bad","Nincs admin jogosultság.");
         return;
       }
       const raceId = $("admin-race").value;
-      const payload = {
-        race_id: raceId,
-        r1: $("ar1").value,
-        r2: $("ar2").value,
-        r3: $("ar3").value,
-        r4: $("ar4").value,
-        r5: $("ar5").value,
-        updated_at: new Date().toISOString()
-      };
 
-      setAdminStatus("warn","Mentés...");
-      const { error } = await sb.from("race_results").upsert(payload, { onConflict: "race_id" });
-      if(error){
-        setAdminStatus("bad","Hiba mentéskor: " + error.message);
+      const d1 = $("ar1").value, d2 = $("ar2").value, d3 = $("ar3").value, d4 = $("ar4").value, d5 = $("ar5").value;
+      const uniq = new Set([d1,d2,d3,d4,d5]);
+      if(uniq.size < 5){
+        setAdminStatus("bad","Ugyanaz a pilóta többször szerepel. Mind az 5 legyen különböző.");
         return;
       }
-      setAdminStatus("ok","Eredmény mentve ✅");
+
+      setAdminStatus("warn","Mentés...");
+
+      // 1) töröljük a futam korábbi sorait
+      const del = await sb.from("race_results").delete().eq("race_id", raceId);
+      if(del.error){
+        setAdminStatus("bad","Hiba törléskor: " + del.error.message);
+        return;
+      }
+
+      // 2) beszúrjuk az 5 sort
+      const rows = [
+        { race_id: raceId, position: 1, driver_id: d1 },
+        { race_id: raceId, position: 2, driver_id: d2 },
+        { race_id: raceId, position: 3, driver_id: d3 },
+        { race_id: raceId, position: 4, driver_id: d4 },
+        { race_id: raceId, position: 5, driver_id: d5 },
+      ];
+
+      const ins = await sb.from("race_results").insert(rows);
+      if(ins.error){
+        setAdminStatus("bad","Hiba mentéskor: " + ins.error.message);
+        return;
+      }
+
+      setAdminStatus("ok","Eredmény mentve ✅ (5 sor)");
     }
 
     // ===================== ROUTER =====================
