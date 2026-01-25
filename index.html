@@ -682,12 +682,12 @@
     }
 
     // ===================== PONTOZÁS =====================
-    // +5 ha pontos hely, +2 ha top5-ben szerepel, de máshol
+    // +3 ha pontos hely, +1 ha top5-ben szerepel, de máshol
     function scorePick(pickIds, resultIds){
       let pts = 0;
       for(let i=0;i<5;i++){
-        if(pickIds[i] && resultIds[i] && String(pickIds[i]) === String(resultIds[i])) pts += 5;
-        else if(pickIds[i] && resultIds.includes(String(pickIds[i]))) pts += 2;
+        if(pickIds[i] && resultIds[i] && String(pickIds[i]) === String(resultIds[i])) pts += 3;
+        else if(pickIds[i] && resultIds.includes(String(pickIds[i]))) pts += 1;
       }
       return pts;
     }
