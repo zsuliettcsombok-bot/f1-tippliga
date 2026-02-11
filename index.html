@@ -325,7 +325,7 @@
             <thead>
               <tr>
                 <th>#</th>
-                <th>Játékos (email)</th>
+                <th>Játékos</th>
                 <th class="right">Pont</th>
                 <th class="right">Futamok</th>
               </tr>
@@ -333,6 +333,24 @@
             <tbody id="standings-body"></tbody>
           </table>
         </div>
+
+        <!-- ✅ ÚJ: Csapat ranglista -->
+        <div style="margin-top:18px">
+          <h3 style="margin:0 0 10px 0">👥 Csapat ranglista</h3>
+          <div style="overflow:auto">
+            <table>
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Csapat</th>
+                  <th class="right">Pont</th>
+                </tr>
+              </thead>
+              <tbody id="team-standings-body"></tbody>
+            </table>
+          </div>
+        </div>
+
       </div>
     </section>
 
@@ -727,11 +745,29 @@
       if(!currentUser){
         $("standings-status").textContent = "Ranglistához kérlek lépj be.";
         $("standings-body").innerHTML = "";
+        const tb = $("team-standings-body");
+        if(tb) tb.innerHTML = "";
         return;
       }
 
       $("standings-status").textContent = "Betöltés...";
       $("standings-body").innerHTML = "";
+      const teamBody = $("team-standings-body");
+      if(teamBody) teamBody.innerHTML = "";
+
+      // ✅ 0) profiles betöltés a névhez (user_id -> display_name/email)
+      const profileMap = new Map();
+      try{
+        const pr = await sb.from("profiles").select("user_id,email,display_name");
+        if(!pr.error){
+          (pr.data || []).forEach(p=>{
+            profileMap.set(String(p.user_id), {
+              display_name: p.display_name || "",
+              email: p.email || ""
+            });
+          });
+        }
+      }catch(e){ /* nem törjük el a ranglistát, ha nincs profile */ }
 
       // 1) összes valós eredmény (5 sor / futam)
       const rr = await sb
@@ -797,16 +833,56 @@
         return;
       }
 
+      // ✅ Egyéni ranglista kirajzolása NÉVVEL
       arr.forEach((u, idx)=>{
         const tr = document.createElement("tr");
+
+        const p = profileMap.get(String(u.user_id)) || {};
+        const name = (p.display_name || p.email || u.user_id);
+
         tr.innerHTML = `
           <td>${idx+1}</td>
-          <td><span class="muted">${u.user_id}</span></td>
+          <td>${name}</td>
           <td class="right"><b>${u.points}</b></td>
           <td class="right">${u.races}</td>
         `;
         $("standings-body").appendChild(tr);
       });
+
+      // ✅ Csapat ranglista számolás (ha vannak team táblák)
+      try{
+        if(teamBody){
+          const tm = await sb.from("team_members").select("team_id,user_id");
+          const ts = await sb.from("teams").select("id,name");
+
+          if(!tm.error && !ts.error){
+            const teamName = new Map((ts.data||[]).map(t=>[String(t.id), t.name]));
+            const userTeam = new Map();
+            (tm.data||[]).forEach(r=> userTeam.set(String(r.user_id), String(r.team_id)));
+
+            const teamPoints = new Map();
+            arr.forEach(u=>{
+              const tid = userTeam.get(String(u.user_id));
+              if(!tid) return;
+              teamPoints.set(tid, (teamPoints.get(tid)||0) + (u.points||0));
+            });
+
+            const teamArr = Array.from(teamPoints.entries())
+              .map(([team_id, points])=>({ team_id, points, name: teamName.get(team_id) || team_id }))
+              .sort((a,b)=>b.points-a.points);
+
+            teamArr.forEach((t, idx)=>{
+              const tr = document.createElement("tr");
+              tr.innerHTML = `
+                <td>${idx+1}</td>
+                <td><b>${t.name}</b></td>
+                <td class="right"><b>${t.points}</b></td>
+              `;
+              teamBody.appendChild(tr);
+            });
+          }
+        }
+      }catch(e){ /* ha nincs team tábla / policy, nem törjük el */ }
 
       $("standings-status").textContent = `Kész. Pontozható futamok: ${resultsMap.size}`;
     }
