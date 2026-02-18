@@ -515,7 +515,7 @@
     async function loadRaces(){
       const { data, error } = await sb
         .from("races")
-        .select("id, round, name, location, start_date, end_date")
+        .select("id, round, name, location, start_date, end_date, start_at")
         .order("round", { ascending: true });
       if(error) throw error;
       racesCache = data || [];
