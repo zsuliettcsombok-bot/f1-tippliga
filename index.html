@@ -83,6 +83,7 @@
     }
     .btn.secondary{background:rgba(0,0,0,.35); border:1px solid var(--border); box-shadow:none; color:var(--text);}
     .btn.small{padding:10px 12px; border-radius:12px; font-weight:800}
+    .btn:disabled{opacity:.5; cursor:not-allowed}
     .muted{color:var(--muted)}
     .status{
       margin-top:14px; padding:12px 14px;
@@ -334,7 +335,6 @@
           </table>
         </div>
 
-        <!-- ✅ ÚJ: Csapat ranglista -->
         <div style="margin-top:18px">
           <h3 style="margin:0 0 10px 0">👥 Csapat ranglista</h3>
           <div style="overflow:auto">
@@ -455,21 +455,32 @@
 
     let myPickRaceIds = new Set();
 
-    // ===== Tipp lezárás helper =====
+    // ===== Idő formázás (HU) + Tipp lezárás =====
+    function formatStartAtHU(race){
+      if(!race || !race.start_at) return "";
+      const d = new Date(race.start_at);
+      if(isNaN(d.getTime())) return "";
+      return new Intl.DateTimeFormat("hu-HU", {
+        year:"numeric", month:"2-digit", day:"2-digit",
+        hour:"2-digit", minute:"2-digit"
+      }).format(d);
+    }
+
     function isRaceLocked(race){
       if(!race || !race.start_at) return false;
       const now = new Date();
       const start = new Date(race.start_at);
+      if(isNaN(start.getTime())) return false;
       return now >= start;
     }
 
     function applyPickLockUI(race){
       const locked = isRaceLocked(race);
+      const btn = $("pick-save");
+      btn.disabled = !!locked;
+
       if(locked){
-        $("pick-status").textContent = "A tippelés lezárult ehhez a futamhoz.";
-        $("pick-save").style.display = "none";
-      } else {
-        $("pick-save").style.display = "inline-flex";
+        $("pick-status").textContent = "⛔ A tippelés lezárult ehhez a futamhoz (rajt után).";
       }
       return locked;
     }
@@ -567,20 +578,30 @@
         el.className = "item";
 
         const hasPick = myPickRaceIds.has(String(r.id));
-        const badge = hasPick
-          ? `<span class="tag ok">✅ Mentve</span>`
-          : `<span class="tag warn">⏳ Nincs tipp</span>`;
+        const locked = isRaceLocked(r);
+        const startTxt = formatStartAtHU(r);
+
+        const badge = locked
+          ? `<span class="tag bad">⛔ Lezárva</span>`
+          : (hasPick
+              ? `<span class="tag ok">✅ Mentve</span>`
+              : `<span class="tag warn">⏳ Nincs tipp</span>`);
 
         el.innerHTML = `
           <div>
             <b>Futam #${r.round || "?"} • ${r.name || "Név nélkül"} ${badge}</b>
-            <div class="muted" style="font-size:12px;margin-top:2px">${r.location || ""} • ${formatRange(r)}</div>
+            <div class="muted" style="font-size:12px;margin-top:2px">
+              ${r.location || ""} • ${formatRange(r)}
+              ${startTxt ? ` • Rajt: ${startTxt}` : ""}
+            </div>
           </div>
-          <button class="btn small">Tipp ➜</button>
+          <button class="btn small" ${locked ? "disabled" : ""}>Tipp ➜</button>
         `;
+
         el.querySelector("button").addEventListener("click", ()=>{
           goto(`#pick?race=${encodeURIComponent(r.id)}`);
         });
+
         list.appendChild(el);
       });
 
@@ -691,11 +712,11 @@
         return;
       }
 
-      // ✅ Tipp lezárás ellenőrzés
+      // ✅ Tipp lezárás ellenőrzés (RAJT UTÁN NINCS MENTÉS)
       const race = racesCache.find(r => String(r.id) === String(currentRaceId));
       if(race && isRaceLocked(race)){
-        $("pick-status").textContent = "A tippelés lezárult ehhez a futamhoz.";
-        $("pick-save").style.display = "none";
+        $("pick-status").textContent = "⛔ A tippelés lezárult ehhez a futamhoz (rajt után).";
+        $("pick-save").disabled = true;
         return;
       }
 
@@ -1079,16 +1100,17 @@
           if(!racesCache.length) { try { await loadRaces(); } catch {} }
           const r2 = racesCache.find(r=>String(r.id)===String(raceId));
 
+          const startTxt = formatStartAtHU(r2);
+
           $("pick-title").textContent = `🏁 Tipp oldal (drag & drop)`;
           $("pick-sub").textContent = r2
-            ? `Futam: #${r2.round || "?"} • ${r2.name || ""} • ${r2.location || ""} • ${formatRange(r2)}`
+            ? `Futam: #${r2.round || "?"} • ${r2.name || ""} • ${r2.location || ""} • ${formatRange(r2)}${startTxt ? ` • Rajt: ${startTxt}` : ""}`
             : `Race ID: ${raceId}`;
 
           clearPick();
           await refreshAuth();
           await loadExistingPick(raceId);
 
-          // ✅ UI lezárás beállítása a rajtidő alapján
           applyPickLockUI(r2);
 
           if(!isRaceLocked(r2)){
