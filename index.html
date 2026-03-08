@@ -344,6 +344,7 @@
                   <th>#</th>
                   <th>Csapat</th>
                   <th class="right">Pont</th>
+                  <th class="right">Tagok</th>
                 </tr>
               </thead>
               <tbody id="team-standings-body"></tbody>
@@ -384,35 +385,6 @@
           <div class="col"><label>5. hely</label><select id="ar5"></select></div>
           <div class="col" style="display:flex; align-items:end; gap:12px">
             <button class="btn" id="admin-save">💾 Eredmény mentése</button>
-            <hr style="border:0;border-top:1px solid rgba(255,255,255,.10);margin:18px 0">
-
-            <h3 style="margin:0 0 10px 0">👥 Csapat összeállítás (2 fő / csapat)</h3>
-            <div class="muted" style="margin-bottom:12px">
-              Szabály: 1 user csak 1 csapatban lehet. Mentéskor automatikusan kivesszük máshonnan.
-            </div>
-
-            <div class="row">
-              <div class="col">
-                <label>Csapat</label>
-                <select id="admin-team"></select>
-              </div>
-              <div class="col">
-                <label>Státusz</label>
-                <div class="status" style="margin-top:6px">
-                  <span class="dot warn" id="team-dot"></span>
-                  <span id="team-status">Betöltés...</span>
-                </div>
-              </div>
-            </div>
-
-            <div class="row" style="margin-top:14px">
-              <div class="col"><label>Tag #1</label><select id="tm1"></select></div>
-              <div class="col"><label>Tag #2</label><select id="tm2"></select></div>
-              <div class="col" style="display:flex; align-items:end; gap:12px">
-                <button class="btn" id="team-save">💾 Csapat mentése</button>
-              </div>
-            </div>
-
           </div>
         </div>
       </div>
@@ -425,7 +397,7 @@
 
   <script>
     const SUPABASE_URL = "https://mtobtiwoiqqxdkduvjmf.supabase.co";
-    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im10b2J0aXdvaXFxeGRrZHV2am1mIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjgxMTY2NzAsImV4cCI6MjA4MzY5MjY3MH0.qB5tb9uj2GN4iKRvyZnv_lVRZ9xnlgtY3rN6oZV_LDc";
+    const SUPABASE_ANON_KEY = "PASTE_YOUR_EXISTING_ANON_KEY_HERE";
 
     const ADMIN_EMAILS = ["zoltan.csombok@hellmann.com","zsuliett.csombok@gmail.com"];
 
@@ -452,10 +424,8 @@
     let driversCache = [];
     let currentRaceId = null;
     let pickSlots = [null,null,null,null,null];
-
     let myPickRaceIds = new Set();
 
-    // ===== Idő formázás (HU) + Tipp lezárás =====
     function formatStartAtHU(race){
       if(!race || !race.start_at) return "";
       const d = new Date(race.start_at);
@@ -491,12 +461,14 @@
       dot.classList.add(kind);
       $("status-text").textContent = text;
     }
+
     function setLoginStatus(kind, text){
       const dot = $("login-dot");
       dot.classList.remove("ok","warn","bad");
       dot.classList.add(kind);
       $("login-status").textContent = text;
     }
+
     function setAdminStatus(kind, text){
       const dot = $("admin-dot");
       dot.classList.remove("ok","warn","bad");
@@ -712,7 +684,6 @@
         return;
       }
 
-      // ✅ Tipp lezárás ellenőrzés (RAJT UTÁN NINCS MENTÉS)
       const race = racesCache.find(r => String(r.id) === String(currentRaceId));
       if(race && isRaceLocked(race)){
         $("pick-status").textContent = "⛔ A tippelés lezárult ehhez a futamhoz (rajt után).";
@@ -783,18 +754,9 @@
     }
 
     async function loadStandings(){
-      if(!currentUser){
-        $("standings-status").textContent = "Ranglistához kérlek lépj be.";
-        $("standings-body").innerHTML = "";
-        const tb = $("team-standings-body");
-        if(tb) tb.innerHTML = "";
-        return;
-      }
-
       $("standings-status").textContent = "Betöltés...";
       $("standings-body").innerHTML = "";
-      const teamBody = $("team-standings-body");
-      if(teamBody) teamBody.innerHTML = "";
+      $("team-standings-body").innerHTML = "";
 
       const profileMap = new Map();
       try{
@@ -807,7 +769,9 @@
             });
           });
         }
-      }catch(e){}
+      }catch(e){
+        console.warn("profiles read failed", e);
+      }
 
       const rr = await sb
         .from("race_results")
@@ -856,21 +820,23 @@
         u.races += 1;
       });
 
-      const arr = Array.from(byUser.values()).sort((a,b)=>b.points-a.points);
+      const individualArr = Array.from(byUser.values()).sort((a,b)=>{
+        if(b.points !== a.points) return b.points - a.points;
+        return b.races - a.races;
+      });
 
       if(resultsMap.size === 0){
         $("standings-status").textContent = "Még nincs pontozható futam (Admin oldalon mentsd el a top5-öt).";
         return;
       }
 
-      if(arr.length === 0){
+      if(individualArr.length === 0){
         $("standings-status").textContent = "Van eredmény, de még nincs tipp azon a futamon.";
         return;
       }
 
-      arr.forEach((u, idx)=>{
+      individualArr.forEach((u, idx)=>{
         const tr = document.createElement("tr");
-
         const p = profileMap.get(String(u.user_id)) || {};
         const name = (p.display_name || p.email || u.user_id);
 
@@ -884,38 +850,67 @@
       });
 
       try{
-        if(teamBody){
-          const tm = await sb.from("team_members").select("team_id,user_id");
-          const ts = await sb.from("teams").select("id,name");
+        const teamRes = await sb.from("teams").select("id,team_name");
+        const memberRes = await sb.from("team_members").select("team_id,user_id");
 
-          if(!tm.error && !ts.error){
-            const teamName = new Map((ts.data||[]).map(t=>[String(t.id), t.name]));
-            const userTeam = new Map();
-            (tm.data||[]).forEach(r=> userTeam.set(String(r.user_id), String(r.team_id)));
+        if(teamRes.error){
+          console.warn("teams read failed", teamRes.error);
+        }
+        if(memberRes.error){
+          console.warn("team_members read failed", memberRes.error);
+        }
 
-            const teamPoints = new Map();
-            arr.forEach(u=>{
-              const tid = userTeam.get(String(u.user_id));
-              if(!tid) return;
-              teamPoints.set(tid, (teamPoints.get(tid)||0) + (u.points||0));
+        if(!teamRes.error && !memberRes.error){
+          const teamNameMap = new Map();
+          (teamRes.data || []).forEach(t=>{
+            teamNameMap.set(String(t.id), t.team_name || `Csapat ${t.id}`);
+          });
+
+          const membersByTeam = new Map();
+          (memberRes.data || []).forEach(m=>{
+            const tid = String(m.team_id);
+            const uid = String(m.user_id);
+            if(!membersByTeam.has(tid)) membersByTeam.set(tid, []);
+            membersByTeam.get(tid).push(uid);
+          });
+
+          const teamArr = [];
+          for(const [teamId, members] of membersByTeam.entries()){
+            let total = 0;
+            const memberNames = [];
+
+            members.forEach(uid=>{
+              const userScore = byUser.get(uid);
+              total += userScore ? Number(userScore.points || 0) : 0;
+
+              const p = profileMap.get(uid) || {};
+              memberNames.push(p.display_name || p.email || uid);
             });
 
-            const teamArr = Array.from(teamPoints.entries())
-              .map(([team_id, points])=>({ team_id, points, name: teamName.get(team_id) || team_id }))
-              .sort((a,b)=>b.points-a.points);
-
-            teamArr.forEach((t, idx)=>{
-              const tr = document.createElement("tr");
-              tr.innerHTML = `
-                <td>${idx+1}</td>
-                <td><b>${t.name}</b></td>
-                <td class="right"><b>${t.points}</b></td>
-              `;
-              teamBody.appendChild(tr);
+            teamArr.push({
+              team_id: teamId,
+              team_name: teamNameMap.get(teamId) || `Csapat ${teamId}`,
+              points: total,
+              members: memberNames.join(" + ")
             });
           }
+
+          teamArr.sort((a,b)=> b.points - a.points);
+
+          teamArr.forEach((t, idx)=>{
+            const tr = document.createElement("tr");
+            tr.innerHTML = `
+              <td>${idx+1}</td>
+              <td><b>${t.team_name}</b></td>
+              <td class="right"><b>${t.points}</b></td>
+              <td class="right">${t.members}</td>
+            `;
+            $("team-standings-body").appendChild(tr);
+          });
         }
-      }catch(e){}
+      }catch(e){
+        console.warn("team standings failed", e);
+      }
 
       $("standings-status").textContent = `Kész. Pontozható futamok: ${resultsMap.size}`;
     }
@@ -1099,7 +1094,6 @@
 
           if(!racesCache.length) { try { await loadRaces(); } catch {} }
           const r2 = racesCache.find(r=>String(r.id)===String(raceId));
-
           const startTxt = formatStartAtHU(r2);
 
           $("pick-title").textContent = `🏁 Tipp oldal (drag & drop)`;
