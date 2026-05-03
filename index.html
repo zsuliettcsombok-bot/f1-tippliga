@@ -92,7 +92,7 @@
       display:flex; gap:10px; align-items:center;
       min-height:44px;
     }
-    .status .dot{width:10px;height:10px;border-radius:50%}
+    .status .dot{width:10px;height:10px;border-radius:50%; flex:0 0 auto}
     .dot.ok{background:var(--ok)}
     .dot.warn{background:var(--warn)}
     .dot.bad{background:#ff3b3b}
@@ -128,6 +128,7 @@
       padding:12px;
       min-height:62px;
       display:flex; align-items:center; justify-content:space-between; gap:12px;
+      margin-bottom:10px;
     }
     .slot .num{
       width:40px;height:40px;border-radius:14px;
@@ -276,22 +277,36 @@
     <section class="card hide" id="page-login" style="margin-top:16px">
       <div class="card-h">
         <h2>🔐 Belépés</h2>
-        <div class="muted">Email + jelszó (Supabase Auth).</div>
+        <div class="muted" id="login-subtitle">Email + jelszó (Supabase Auth).</div>
       </div>
       <div class="card-b">
         <div class="row">
           <div class="col">
             <label>Email</label>
-            <input id="login-email" placeholder="email@valami.com" />
+            <input id="login-email" placeholder="email@valami.com" autocomplete="email" />
           </div>
           <div class="col">
             <label>Jelszó</label>
-            <input id="login-pass" type="password" placeholder="••••••••" />
+            <input id="login-pass" type="password" placeholder="••••••••" autocomplete="current-password" />
           </div>
         </div>
+
+        <div class="row hide" id="new-password-row" style="margin-top:14px">
+          <div class="col">
+            <label>Új jelszó</label>
+            <input id="new-pass" type="password" placeholder="Új jelszó" autocomplete="new-password" />
+          </div>
+          <div class="col">
+            <label>Új jelszó újra</label>
+            <input id="new-pass2" type="password" placeholder="Új jelszó újra" autocomplete="new-password" />
+          </div>
+        </div>
+
         <div class="row" style="margin-top:14px">
           <button class="btn" id="btn-signin">Belépés</button>
           <button class="btn secondary" id="btn-signup">Regisztráció</button>
+          <button class="btn secondary" id="btn-reset">Elfelejtett jelszó</button>
+          <button class="btn secondary hide" id="btn-update-password">Új jelszó mentése</button>
           <button class="btn secondary" id="btn-signout">Kijelentkezés</button>
           <button class="btn secondary" id="login-back">Vissza</button>
         </div>
@@ -402,7 +417,12 @@
     const ADMIN_EMAILS = ["zoltan.csombok@hellmann.com","zsuliett.csombok@gmail.com"];
 
     const sb = window.sb || (window.sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
-      auth: { persistSession: true, autoRefreshToken: true, storage: window.localStorage }
+      auth: {
+        persistSession: true,
+        autoRefreshToken: true,
+        detectSessionInUrl: true,
+        storage: window.localStorage
+      }
     }));
 
     const $ = (id)=>document.getElementById(id);
@@ -425,6 +445,26 @@
     let currentRaceId = null;
     let pickSlots = [null,null,null,null,null];
     let myPickRaceIds = new Set();
+    let passwordRecoveryMode = false;
+
+    function formatAuthError(error){
+      const raw = error?.message || String(error || "Ismeretlen hiba");
+      const lower = raw.toLowerCase();
+
+      if(raw === "Invalid login credentials"){
+        return "Nem sikerült belépni. Lehet hibás email/jelszó, nincs megerősítve az email, vagy ehhez az emailhez még nincs jelszó beállítva. Próbáld az Elfelejtett jelszó gombot.";
+      }
+      if(lower.includes("email not confirmed")){
+        return "Az email cím még nincs megerősítve. Nézd meg a megerősítő emailt, vagy Supabase adminban erősítsd meg.";
+      }
+      if(lower.includes("password should be at least") || lower.includes("weak password")){
+        return "A jelszó túl rövid vagy túl gyenge. Adj meg legalább 6 karakteres jelszót.";
+      }
+      if(lower.includes("rate limit") || lower.includes("too many")){
+        return "Túl sok próbálkozás történt. Várj pár percet, majd próbáld újra.";
+      }
+      return raw;
+    }
 
     function formatStartAtHU(race){
       if(!race || !race.start_at) return "";
@@ -476,20 +516,36 @@
       $("admin-status").textContent = text;
     }
 
+    function setPasswordRecoveryUI(on){
+      passwordRecoveryMode = !!on;
+      $("new-password-row").classList.toggle("hide", !on);
+      $("btn-update-password").classList.toggle("hide", !on);
+      $("btn-signin").classList.toggle("hide", on);
+      $("btn-signup").classList.toggle("hide", on);
+      $("btn-reset").classList.toggle("hide", on);
+      $("login-subtitle").textContent = on
+        ? "Jelszó visszaállítás: adj meg új jelszót, majd mentsd el."
+        : "Email + jelszó (Supabase Auth).";
+    }
+
     async function refreshAuth(){
       const { data, error } = await sb.auth.getUser();
       if(error){
         currentUser = null;
-        setStatus("warn", "Auth hiba (nincs belépve).");
+        setStatus("warn", "Auth hiba vagy nincs belépve.");
         setLoginStatus("warn", "Nincs belépve.");
       } else {
         currentUser = data?.user ?? null;
         if(currentUser){
           setStatus("ok", "Bejelentkezve: " + (currentUser.email || "felhasználó"));
-          setLoginStatus("ok", "Bejelentkezve: " + (currentUser.email || "felhasználó"));
+          if(!passwordRecoveryMode){
+            setLoginStatus("ok", "Bejelentkezve: " + (currentUser.email || "felhasználó"));
+          }
         }else{
           setStatus("warn", "Nincs belépve. A mentéshez belépés kell.");
-          setLoginStatus("warn", "Nincs belépve.");
+          if(!passwordRecoveryMode){
+            setLoginStatus("warn", "Nincs belépve.");
+          }
         }
       }
 
@@ -499,7 +555,66 @@
       return currentUser;
     }
 
-    sb.auth.onAuthStateChange(()=>{ refreshAuth(); });
+    sb.auth.onAuthStateChange(async (event, session)=>{
+      console.log("AUTH EVENT:", event, session?.user?.email || "no user");
+
+      if(event === "PASSWORD_RECOVERY"){
+        setPasswordRecoveryUI(true);
+        showPage("login");
+        setLoginStatus("warn", "Jelszó visszaállítás mód aktív. Adj meg új jelszót.");
+        return;
+      }
+
+      await refreshAuth();
+    });
+
+    async function checkPasswordRecoveryFromUrl(){
+      const full = window.location.href;
+      const hash = window.location.hash || "";
+      const search = window.location.search || "";
+
+      if(full.includes("type=recovery") || hash.includes("type=recovery") || search.includes("type=recovery")){
+        setPasswordRecoveryUI(true);
+        showPage("login");
+        setLoginStatus("warn", "Jelszó visszaállítás mód aktív. Adj meg új jelszót.");
+        return true;
+      }
+      return false;
+    }
+
+    async function updatePasswordFromRecovery(){
+      const p1 = $("new-pass").value;
+      const p2 = $("new-pass2").value;
+
+      if(!p1 || !p2){
+        setLoginStatus("warn", "Add meg kétszer az új jelszót.");
+        return;
+      }
+      if(p1.length < 6){
+        setLoginStatus("warn", "Az új jelszó legyen legalább 6 karakter.");
+        return;
+      }
+      if(p1 !== p2){
+        setLoginStatus("bad", "A két jelszó nem egyezik.");
+        return;
+      }
+
+      setLoginStatus("warn", "Új jelszó mentése...");
+
+      const { error } = await sb.auth.updateUser({ password: p1 });
+      if(error){
+        console.error("UPDATE PASSWORD ERROR:", error);
+        setLoginStatus("bad", "Hiba: " + formatAuthError(error));
+        return;
+      }
+
+      $("new-pass").value = "";
+      $("new-pass2").value = "";
+      setPasswordRecoveryUI(false);
+      setLoginStatus("ok", "Új jelszó mentve ✅ Most már be tudsz lépni az új jelszóval.");
+      history.replaceState(null, "", window.location.pathname + "#login");
+      await refreshAuth();
+    }
 
     async function loadDrivers(){
       const { data, error } = await sb
@@ -1020,6 +1135,11 @@
     }
 
     async function onRoute(){
+      if(passwordRecoveryMode){
+        showPage("login");
+        return;
+      }
+
       const { route, params } = parseHash();
 
       if(route === "home"){ showPage("home"); return; }
@@ -1149,31 +1269,83 @@
     $("login-back").addEventListener("click", ()=>goto("#home"));
 
     $("btn-signin").addEventListener("click", async ()=>{
-      const email = $("login-email").value.trim();
+      const email = $("login-email").value.trim().toLowerCase();
       const password = $("login-pass").value;
       if(!email || !password){ setLoginStatus("warn","Hiányzik email vagy jelszó."); return; }
       setLoginStatus("warn","Belépés...");
+
       const { error } = await sb.auth.signInWithPassword({ email, password });
-      if(error){ setLoginStatus("bad","Hiba: " + error.message); return; }
+      if(error){
+        console.error("LOGIN ERROR:", error);
+        setLoginStatus("bad","Hiba: " + formatAuthError(error));
+        return;
+      }
+
       setLoginStatus("ok","Sikeres belépés ✅");
+      await refreshAuth();
       goto("#home");
     });
 
     $("btn-signup").addEventListener("click", async ()=>{
-      const email = $("login-email").value.trim();
+      const email = $("login-email").value.trim().toLowerCase();
       const password = $("login-pass").value;
       if(!email || !password){ setLoginStatus("warn","Hiányzik email vagy jelszó."); return; }
+      if(password.length < 6){ setLoginStatus("warn","A jelszó legyen legalább 6 karakter."); return; }
+
       setLoginStatus("warn","Regisztráció...");
-      const { error } = await sb.auth.signUp({ email, password });
-      if(error){ setLoginStatus("bad","Hiba: " + error.message); return; }
-      setLoginStatus("ok","Regisztráció ok ✅");
-      goto("#home");
+
+      const { data, error } = await sb.auth.signUp({
+        email,
+        password,
+        options: {
+          emailRedirectTo: window.location.origin + window.location.pathname + "#login"
+        }
+      });
+
+      if(error){
+        console.error("SIGNUP ERROR:", error);
+        setLoginStatus("bad","Hiba: " + formatAuthError(error));
+        return;
+      }
+
+      if(data?.user && !data?.session){
+        setLoginStatus("ok","Regisztráció kész ✅ Nézd meg az emailedet, lehet hogy meg kell erősíteni.");
+      }else{
+        setLoginStatus("ok","Regisztráció és belépés kész ✅");
+        await refreshAuth();
+        goto("#home");
+      }
     });
+
+    $("btn-reset").addEventListener("click", async ()=>{
+      const email = $("login-email").value.trim().toLowerCase();
+      if(!email){
+        setLoginStatus("warn","Add meg az email címed a jelszó resethez.");
+        return;
+      }
+
+      setLoginStatus("warn","Jelszó reset email küldése...");
+
+      const redirectTo = window.location.origin + window.location.pathname + "#login";
+      const { error } = await sb.auth.resetPasswordForEmail(email, { redirectTo });
+
+      if(error){
+        console.error("RESET ERROR:", error);
+        setLoginStatus("bad","Hiba: " + formatAuthError(error));
+        return;
+      }
+
+      setLoginStatus("ok","Reset email elküldve ✅ Nézd meg a leveled, majd kattints a linkre.");
+    });
+
+    $("btn-update-password").addEventListener("click", updatePasswordFromRecovery);
 
     $("btn-signout").addEventListener("click", async ()=>{
       setLoginStatus("warn","Kijelentkezés...");
       const { error } = await sb.auth.signOut();
-      if(error){ setLoginStatus("bad","Hiba: " + error.message); return; }
+      if(error){ setLoginStatus("bad","Hiba: " + formatAuthError(error)); return; }
+      currentUser = null;
+      setPasswordRecoveryUI(false);
       setLoginStatus("ok","Kijelentkezve ✅");
       goto("#home");
     });
@@ -1185,10 +1357,12 @@
 
     (async function init(){
       try{
+        setPasswordRecoveryUI(false);
+        await checkPasswordRecoveryFromUrl();
         await refreshAuth();
         try{ await loadDrivers(); }catch(e){ console.warn("drivers load failed", e); }
         try{ await loadRaces(); }catch(e){ console.warn("races load failed", e); }
-        onRoute();
+        await onRoute();
       }catch(e){
         console.error(e);
         setStatus("bad", "Inicializálási hiba: " + (e?.message || e));
