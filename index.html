@@ -555,7 +555,7 @@
       return currentUser;
     }
 
-    sb.auth.onAuthStateChange(async (event, session)=>{
+    sb.auth.onAuthStateChange((event, session)=>{
       console.log("AUTH EVENT:", event, session?.user?.email || "no user");
 
       if(event === "PASSWORD_RECOVERY"){
@@ -565,7 +565,8 @@
         return;
       }
 
-      await refreshAuth();
+      currentUser = session?.user || null;
+      setTimeout(()=>{ refreshAuth(); }, 0);
     });
 
     async function checkPasswordRecoveryFromUrl(){
